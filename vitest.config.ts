@@ -6,7 +6,7 @@ export default defineConfig({
   test: {
     environment: "node",
     setupFiles: ["./tests/setup.ts"],
-    include: ["src/**/*.test.ts", "tests/**/*.test.ts"],
+    include: ["src/**/*.test.{ts,tsx}", "tests/**/*.test.{ts,tsx}"],
     // Les tests ne touchent jamais la base de dev : DATABASE_URL pointe sur la base de test.
     env: { DATABASE_URL: process.env.TEST_DATABASE_URL ?? "" },
     // Les tests d'intégration partagent une seule base.
