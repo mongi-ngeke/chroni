@@ -18,9 +18,9 @@ import type {
 } from '@prisma/orm-postgres/contract-types';
 
 export type StorageHash =
-  StorageHashBase<'444401844d52f353b4d9115f80c0d1b04a64d232f2d846943bd6ef35e93c3ea0'>;
+  StorageHashBase<'444761c06bb0c698252de4a0c47cfacd102ccc7a672d80ecb1ab1742bf5e1341'>;
 export type ExecutionHash =
-  ExecutionHashBase<'0436e456aeb69bd801ff25418d6b1fb1c7efb90b6f936b3da02284fbdc16ef77'>;
+  ExecutionHashBase<'a21fb9e45d83e78b31f0348ea922789c98ec68bb1a65e27cddf9bbc4325b3753'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -270,7 +270,24 @@ type DefaultLiteralValue<CodecId extends string, Encoded> = CodecId extends keyo
   : Encoded;
 type ParameterizedOutputTypeFunctions = PgParameterizedOutputTypes;
 
-type FieldTypeOverrides = {};
+type FieldTypeOverrides = {
+  readonly public: {
+    readonly models: {
+      readonly Run: {
+        readonly status: {
+          readonly output: 'in_progress' | 'won';
+          readonly input: 'in_progress' | 'won';
+        };
+      };
+      readonly RunCard: {
+        readonly zone: {
+          readonly output: 'timeline' | 'hand' | 'draw_pile' | 'discard';
+          readonly input: 'timeline' | 'hand' | 'draw_pile' | 'discard';
+        };
+      };
+    };
+  };
+};
 export type FieldOutputTypes = FieldTypesFromDomain<
   ContractBase['domain']['namespaces'],
   CodecTypes,
@@ -287,7 +304,22 @@ export type FieldInputTypes = FieldTypesFromDomain<
   'input',
   ContractBase['storage']['namespaces']
 >;
-type ColumnTypeOverrides = {};
+type ColumnTypeOverrides = {
+  readonly public: {
+    readonly Run: {
+      readonly status: {
+        readonly output: 'in_progress' | 'won';
+        readonly input: 'in_progress' | 'won';
+      };
+    };
+    readonly RunCard: {
+      readonly zone: {
+        readonly output: 'timeline' | 'hand' | 'draw_pile' | 'discard';
+        readonly input: 'timeline' | 'hand' | 'draw_pile' | 'discard';
+      };
+    };
+  };
+};
 export type StorageColumnTypes = ColumnTypesFromStorage<
   ContractBase['storage'],
   CodecTypes,
@@ -310,13 +342,33 @@ export namespace Models {
     id: FieldOutputTypes['public']['Card']['id'];
     title: FieldOutputTypes['public']['Card']['title'];
     year: FieldOutputTypes['public']['Card']['year'];
-    readonly [RelationKeys]?: never;
+    runCards: public_RunCard[];
+    readonly [RelationKeys]?: 'runCards';
+  };
+  export type public_Run = {
+    createdAt: FieldOutputTypes['public']['Run']['createdAt'];
+    id: FieldOutputTypes['public']['Run']['id'];
+    status: FieldOutputTypes['public']['Run']['status'];
+    updatedAt: FieldOutputTypes['public']['Run']['updatedAt'];
+    cards: public_RunCard[];
+    readonly [RelationKeys]?: 'cards';
+  };
+  export type public_RunCard = {
+    cardId: FieldOutputTypes['public']['RunCard']['cardId'];
+    position: FieldOutputTypes['public']['RunCard']['position'];
+    runId: FieldOutputTypes['public']['RunCard']['runId'];
+    zone: FieldOutputTypes['public']['RunCard']['zone'];
+    card: public_Card;
+    run: public_Run;
+    readonly [RelationKeys]?: 'card' | 'run';
   };
 }
 
 export declare const models: {
   public: {
     Card: Models.public_Card;
+    Run: Models.public_Run;
+    RunCard: Models.public_RunCard;
   };
 };
 
@@ -377,6 +429,120 @@ type ContractBase = Omit<
               indexes: readonly [];
               foreignKeys: readonly [];
             };
+            readonly Run: {
+              columns: {
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [];
+              foreignKeys: readonly [];
+            };
+            readonly RunCard: {
+              columns: {
+                readonly cardId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly position: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly runId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly zone: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['runId', 'cardId'] };
+              uniques: readonly [{ readonly columns: readonly ['runId', 'zone', 'position'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'RunCard_cardId_idx_c511c1e1';
+                  readonly prefix: 'RunCard_cardId_idx';
+                  readonly columns: readonly ['cardId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'RunCard_runId_idx_a6016437';
+                  readonly prefix: 'RunCard_runId_idx';
+                  readonly columns: readonly ['runId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'RunCard';
+                    readonly columns: readonly ['runId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Run';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'RunCard';
+                    readonly columns: readonly ['cardId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Card';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+          };
+          readonly valueSet: {
+            readonly RunStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['in_progress', 'won'];
+            };
+            readonly RunZone: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['timeline', 'hand', 'draw_pile', 'discard'];
+            };
           };
         };
       };
@@ -389,6 +555,8 @@ type ContractBase = Omit<
   readonly targetFamily: 'sql';
   readonly roots: {
     readonly Card: { readonly namespace: 'public' & NamespaceId; readonly model: 'Card' };
+    readonly Run: { readonly namespace: 'public' & NamespaceId; readonly model: 'Run' };
+    readonly RunCard: { readonly namespace: 'public' & NamespaceId; readonly model: 'RunCard' };
   };
   readonly domain: {
     readonly namespaces: {
@@ -421,7 +589,19 @@ type ContractBase = Omit<
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
             };
-            readonly relations: Record<string, never>;
+            readonly relations: {
+              readonly runCards: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'RunCard';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['cardId'];
+                };
+              };
+            };
             readonly storage: {
               readonly table: 'Card';
               readonly namespaceId: 'public';
@@ -434,6 +614,137 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly Run: {
+            readonly fields: {
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+            };
+            readonly relations: {
+              readonly cards: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'RunCard';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['runId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'Run';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly id: { readonly column: 'id' };
+                readonly status: { readonly column: 'status' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
+          readonly RunCard: {
+            readonly fields: {
+              readonly cardId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly position: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly runId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly zone: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly card: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Card' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['cardId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly run: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Run' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['runId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'RunCard';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly cardId: { readonly column: 'cardId' };
+                readonly position: { readonly column: 'position' };
+                readonly runId: { readonly column: 'runId' };
+                readonly zone: { readonly column: 'zone' };
+              };
+            };
+          };
+        };
+        readonly enum: {
+          readonly RunStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'in_progress'; readonly value: 'in_progress' },
+              { readonly name: 'won'; readonly value: 'won' },
+            ];
+          };
+          readonly RunZone: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'timeline'; readonly value: 'timeline' },
+              { readonly name: 'hand'; readonly value: 'hand' },
+              { readonly name: 'draw_pile'; readonly value: 'draw_pile' },
+              { readonly name: 'discard'; readonly value: 'discard' },
+            ];
+          };
+        };
+        readonly enumMemberTypes?: {
+          readonly RunStatus: readonly [
+            { readonly name: 'in_progress'; readonly value: 'in_progress' },
+            { readonly name: 'won'; readonly value: 'won' },
+          ];
+          readonly RunZone: readonly [
+            { readonly name: 'timeline'; readonly value: 'timeline' },
+            { readonly name: 'hand'; readonly value: 'hand' },
+            { readonly name: 'draw_pile'; readonly value: 'draw_pile' },
+            { readonly name: 'discard'; readonly value: 'discard' },
+          ];
         };
       };
     };
@@ -491,6 +802,35 @@ type ContractBase = Omit<
           readonly ref: {
             readonly entry: 'Card';
             readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly ref: {
+            readonly entry: 'Run';
+            readonly field: 'createdAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly onUpdate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly ref: {
+            readonly entry: 'Run';
+            readonly field: 'updatedAt';
             readonly namespace: 'public';
           };
         },

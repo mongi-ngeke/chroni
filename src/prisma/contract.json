@@ -7,11 +7,55 @@
     "Card": {
       "model": "Card",
       "namespace": "public"
+    },
+    "Run": {
+      "model": "Run",
+      "namespace": "public"
+    },
+    "RunCard": {
+      "model": "RunCard",
+      "namespace": "public"
     }
   },
   "domain": {
     "namespaces": {
       "public": {
+        "enum": {
+          "RunStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "in_progress",
+                "value": "in_progress"
+              },
+              {
+                "name": "won",
+                "value": "won"
+              }
+            ]
+          },
+          "RunZone": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "timeline",
+                "value": "timeline"
+              },
+              {
+                "name": "hand",
+                "value": "hand"
+              },
+              {
+                "name": "draw_pile",
+                "value": "draw_pile"
+              },
+              {
+                "name": "discard",
+                "value": "discard"
+              }
+            ]
+          }
+        },
         "models": {
           "Card": {
             "fields": {
@@ -54,7 +98,23 @@
                 }
               }
             },
-            "relations": {},
+            "relations": {
+              "runCards": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "cardId"
+                  ]
+                },
+                "to": {
+                  "model": "RunCard",
+                  "namespace": "public"
+                }
+              }
+            },
             "storage": {
               "fields": {
                 "category": {
@@ -75,6 +135,175 @@
               },
               "namespaceId": "public",
               "table": "Card"
+            }
+          },
+          "Run": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "RunStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              }
+            },
+            "relations": {
+              "cards": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "runId"
+                  ]
+                },
+                "to": {
+                  "model": "RunCard",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "Run"
+            }
+          },
+          "RunCard": {
+            "fields": {
+              "cardId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "position": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "runId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "zone": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "RunZone",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              }
+            },
+            "relations": {
+              "card": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "cardId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Card",
+                  "namespace": "public"
+                }
+              },
+              "run": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "runId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Run",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "cardId": {
+                  "column": "cardId"
+                },
+                "position": {
+                  "column": "position"
+                },
+                "runId": {
+                  "column": "runId"
+                },
+                "zone": {
+                  "column": "zone"
+                }
+              },
+              "namespaceId": "public",
+              "table": "RunCard"
             }
           }
         }
@@ -125,6 +354,187 @@
                 ]
               },
               "uniques": []
+            },
+            "Run": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('in_progress', 'won')",
+                  "name": "Run_status_check_97469d4c",
+                  "prefix": "Run_status_check"
+                }
+              ],
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "RunStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "RunCard": {
+              "checks": [
+                {
+                  "expression": "\"zone\" IN ('timeline', 'hand', 'draw_pile', 'discard')",
+                  "name": "RunCard_zone_check_677dc65a",
+                  "prefix": "RunCard_zone_check"
+                }
+              ],
+              "columns": {
+                "cardId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "position": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "nullable": false
+                },
+                "runId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "zone": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "RunZone",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                }
+              },
+              "foreignKeys": [
+                {
+                  "index": {
+                    "name": "RunCard_runId_idx_a6016437"
+                  },
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "runId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "RunCard"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Run"
+                  }
+                },
+                {
+                  "index": {
+                    "name": "RunCard_cardId_idx_c511c1e1"
+                  },
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "cardId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "RunCard"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Card"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "cardId"
+                  ],
+                  "name": "RunCard_cardId_idx_c511c1e1",
+                  "prefix": "RunCard_cardId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "runId"
+                  ],
+                  "name": "RunCard_runId_idx_a6016437",
+                  "prefix": "RunCard_runId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "runId",
+                  "cardId"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "runId",
+                    "zone",
+                    "position"
+                  ]
+                }
+              ]
+            }
+          },
+          "valueSet": {
+            "RunStatus": {
+              "kind": "valueSet",
+              "values": [
+                "in_progress",
+                "won"
+              ]
+            },
+            "RunZone": {
+              "kind": "valueSet",
+              "values": [
+                "timeline",
+                "hand",
+                "draw_pile",
+                "discard"
+              ]
             }
           }
         },
@@ -132,10 +542,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "444401844d52f353b4d9115f80c0d1b04a64d232f2d846943bd6ef35e93c3ea0"
+    "storageHash": "444761c06bb0c698252de4a0c47cfacd102ccc7a672d80ecb1ab1742bf5e1341"
   },
   "execution": {
-    "executionHash": "0436e456aeb69bd801ff25418d6b1fb1c7efb90b6f936b3da02284fbdc16ef77",
+    "executionHash": "a21fb9e45d83e78b31f0348ea922789c98ec68bb1a65e27cddf9bbc4325b3753",
     "mutations": {
       "defaults": [
         {
@@ -160,6 +570,41 @@
           "ref": {
             "entry": "Card",
             "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
+          "ref": {
+            "entry": "Run",
+            "field": "createdAt",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
+          "ref": {
+            "entry": "Run",
+            "field": "updatedAt",
             "namespace": "public"
           }
         }

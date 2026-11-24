@@ -1,10 +1,49 @@
 // use prisma-8
 // Contrat de données de Chroni.
 
+enum RunStatus {
+  @@type("pg/text@1")
+  in_progress = "in_progress"
+  won         = "won"
+}
+
+// Où se trouve une carte d'un run.
+enum RunZone {
+  @@type("pg/text@1")
+  timeline  = "timeline"
+  hand      = "hand"
+  draw_pile = "draw_pile"
+  discard   = "discard"
+}
+
 model Card {
-  id        String   @id @onCreate(cuid(2))
+  id        String    @id @onCreate(cuid(2))
   title     String
   year      Int
   category  String?
-  createdAt DateTime @onCreate(now())
+  createdAt DateTime  @onCreate(now())
+  runCards  RunCard[]
+}
+
+model Run {
+  id        String    @id
+  status    RunStatus
+  createdAt DateTime  @onCreate(now())
+  updatedAt DateTime  @onCreate(now()) @onUpdate(now())
+  cards     RunCard[]
+}
+
+// Une carte dans un run. `position` ordonne la frise, la pioche (0 = dessus) et
+// la défausse ; dans la main elle n'a pas de sens métier (le serveur ne connaît pas l'ordre).
+model RunCard {
+  runId    String
+  cardId   String
+  zone     RunZone
+  position Int
+  run      Run     @relation(fields: [runId], references: [id], onDelete: Cascade)
+  card     Card    @relation(fields: [cardId], references: [id], onDelete: Restrict)
+
+  @@id([runId, cardId])
+  @@unique([runId, zone, position])
+  @@index([cardId])
 }

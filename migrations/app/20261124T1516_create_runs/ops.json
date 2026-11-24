@@ -1,0 +1,348 @@
+[
+  {
+    "id": "table.Run",
+    "label": "Create table \"Run\"",
+    "summary": "Creates table \"Run\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Run"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Run\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Run\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"Run\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Run\"",
+        "sql": "CREATE TABLE \"public\".\"Run\" (\n  \"createdAt\" timestamptz(3) NOT NULL,\n  \"id\" text NOT NULL,\n  \"status\" text NOT NULL,\n  \"updatedAt\" timestamptz(3) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"Run_status_check_97469d4c\" CHECK (\"status\" IN ('in_progress', 'won'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Run\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"Run\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"Run\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.RunCard",
+    "label": "Create table \"RunCard\"",
+    "summary": "Creates table \"RunCard\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "RunCard"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"RunCard\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"RunCard\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"RunCard\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"RunCard\"",
+        "sql": "CREATE TABLE \"public\".\"RunCard\" (\n  \"cardId\" text NOT NULL,\n  \"position\" int4 NOT NULL,\n  \"runId\" text NOT NULL,\n  \"zone\" text NOT NULL,\n  PRIMARY KEY (\"runId\", \"cardId\"),\n  CONSTRAINT \"RunCard_zone_check_677dc65a\" CHECK (\"zone\" IN ('timeline', 'hand', 'draw_pile', 'discard'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"RunCard\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"RunCard\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"RunCard\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "unique.RunCard.RunCard_runId_zone_position_key",
+    "label": "Add unique constraint on \"RunCard\" (runId, zone, position)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "RunCard_runId_zone_position_key",
+        "table": "RunCard"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"RunCard_runId_zone_position_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "RunCard_runId_zone_position_key",
+          "public",
+          "\"public\".\"RunCard\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"RunCard_runId_zone_position_key\" on \"RunCard\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"RunCard_runId_zone_position_key\"",
+        "sql": "ALTER TABLE \"public\".\"RunCard\" ADD CONSTRAINT \"RunCard_runId_zone_position_key\" UNIQUE (\"runId\", \"zone\", \"position\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"RunCard_runId_zone_position_key\" exists on (runId, zone, position)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "RunCard_runId_zone_position_key",
+          "public",
+          "\"public\".\"RunCard\"",
+          "u",
+          "[\"runId\",\"zone\",\"position\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.RunCard.RunCard_cardId_idx_c511c1e1",
+    "label": "Create index \"RunCard_cardId_idx_c511c1e1\" on \"RunCard\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "RunCard_cardId_idx_c511c1e1",
+        "table": "RunCard"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"RunCard_cardId_idx_c511c1e1\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"RunCard_cardId_idx_c511c1e1\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"RunCard_cardId_idx_c511c1e1\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"RunCard_cardId_idx_c511c1e1\"",
+        "sql": "CREATE INDEX \"RunCard_cardId_idx_c511c1e1\" ON \"public\".\"RunCard\" (\"cardId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"RunCard_cardId_idx_c511c1e1\" exists on \"RunCard\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"RunCard_cardId_idx_c511c1e1\"",
+          "i",
+          "I",
+          "\"public\".\"RunCard\"",
+          "btree",
+          "[\"cardId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.RunCard.RunCard_runId_idx_a6016437",
+    "label": "Create index \"RunCard_runId_idx_a6016437\" on \"RunCard\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "RunCard_runId_idx_a6016437",
+        "table": "RunCard"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"RunCard_runId_idx_a6016437\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"RunCard_runId_idx_a6016437\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"RunCard_runId_idx_a6016437\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"RunCard_runId_idx_a6016437\"",
+        "sql": "CREATE INDEX \"RunCard_runId_idx_a6016437\" ON \"public\".\"RunCard\" (\"runId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"RunCard_runId_idx_a6016437\" exists on \"RunCard\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"RunCard_runId_idx_a6016437\"",
+          "i",
+          "I",
+          "\"public\".\"RunCard\"",
+          "btree",
+          "[\"runId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.RunCard.RunCard_runId_fkey",
+    "label": "Add foreign key \"RunCard_runId_fkey\" on \"RunCard\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "RunCard_runId_fkey",
+        "table": "RunCard"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"RunCard_runId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "RunCard_runId_fkey",
+          "public",
+          "\"public\".\"RunCard\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"RunCard_runId_fkey\" on \"RunCard\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"RunCard_runId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"RunCard\"\nADD CONSTRAINT \"RunCard_runId_fkey\"\nFOREIGN KEY (\"runId\")\nREFERENCES \"public\".\"Run\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"RunCard_runId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "RunCard_runId_fkey",
+          "public",
+          "\"public\".\"RunCard\"",
+          "f",
+          "[\"runId\"]",
+          "\"public\".\"Run\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.RunCard.RunCard_cardId_fkey",
+    "label": "Add foreign key \"RunCard_cardId_fkey\" on \"RunCard\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "RunCard_cardId_fkey",
+        "table": "RunCard"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"RunCard_cardId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "RunCard_cardId_fkey",
+          "public",
+          "\"public\".\"RunCard\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"RunCard_cardId_fkey\" on \"RunCard\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"RunCard_cardId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"RunCard\"\nADD CONSTRAINT \"RunCard_cardId_fkey\"\nFOREIGN KEY (\"cardId\")\nREFERENCES \"public\".\"Card\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"RunCard_cardId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "RunCard_cardId_fkey",
+          "public",
+          "\"public\".\"RunCard\"",
+          "f",
+          "[\"cardId\"]",
+          "\"public\".\"Card\"",
+          "[\"id\"]",
+          "r",
+          "a"
+        ]
+      }
+    ]
+  }
+]
