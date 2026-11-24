@@ -1,11 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useMemo, useReducer, useState } from "react";
-import { ApiError, createRunsApi } from "../api-client";
+import { useMemo, useReducer } from "react";
+import { createRunsApi } from "../api-client";
 import {
   canPlay,
-  errorMessage,
   gameReducer,
   initialGameState,
   playSelectedCard,
@@ -15,30 +13,16 @@ import type { RunResponse } from "../schemas";
 import { CardView } from "./card-view";
 import { Hand } from "./hand";
 import { PlayFeedback } from "./play-feedback";
+import { StartButton } from "./start-button";
 import { Timeline } from "./timeline";
 
 export function GameBoard({ initialRun }: { initialRun: RunResponse }) {
-  const router = useRouter();
   const api = useMemo(() => createRunsApi(), []);
   const [state, dispatch] = useReducer(gameReducer, initialRun, initialGameState);
-  const [restartError, setRestartError] = useState<string | null>(null);
-  const [restarting, setRestarting] = useState(false);
 
   const { run } = state;
   const selected = run.hand.find((card) => card.id === state.selectedCardId);
   const won = run.status === "won";
-
-  async function startNewRun() {
-    setRestarting(true);
-    setRestartError(null);
-    try {
-      const next = await api.startRun();
-      router.push(`/runs/${next.id}`);
-    } catch (error) {
-      setRestartError(errorMessage(error instanceof ApiError ? error.code : "UNKNOWN"));
-      setRestarting(false);
-    }
-  }
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-8 p-4 sm:p-8">
@@ -54,19 +38,9 @@ export function GameBoard({ initialRun }: { initialRun: RunResponse }) {
             Frise complète : {run.timeline.length} cartes, dont {run.discard.length} ratée
             {run.discard.length > 1 ? "s" : ""}.
           </p>
-          <button
-            type="button"
-            onClick={startNewRun}
-            disabled={restarting}
-            className="mt-4 rounded-lg bg-amber-600 px-5 py-2 font-semibold text-white hover:bg-amber-700 disabled:opacity-60"
-          >
-            Rejouer
-          </button>
-          {restartError !== null && (
-            <p role="alert" className="mt-3 text-sm text-red-700">
-              {restartError}
-            </p>
-          )}
+          <div className="mt-4">
+            <StartButton label="Rejouer" />
+          </div>
         </section>
       )}
 
