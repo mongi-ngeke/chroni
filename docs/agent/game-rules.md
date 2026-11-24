@@ -25,6 +25,24 @@
 - La date d'une carte n'est JAMAIS envoyée au client avant que la carte soit
   jouée ou révélée.
 
+## Contenu d'une carte
+- Une carte a un titre, une description et une image.
+- Description : en français, 3 à 5 phrases (300 à 600 caractères), affichée en
+  entier sur la carte. Elle contextualise l'événement sans jamais donner la
+  date.
+- Image : URL `https` d'une image de Wikimedia Commons, avec un texte
+  alternatif et un crédit (auteur et licence). Les crédits sont listés sur la
+  page `/credits` (attribution exigée par les licences Creative Commons).
+- Description et image sont visibles dès la main : elles ne doivent donc rien
+  révéler de la date.
+  - Interdit dans la description, le texte alternatif et le nom de fichier de
+    l'URL : tout nombre de 3 ou 4 chiffres et le mot « siècle ».
+  - Le domaine refuse en plus toute carte dont ces textes ou l'URL contiennent
+    l'année de la carte comme nombre isolé.
+  - Le contexte (« pendant la guerre froide ») reste permis : c'est un indice
+    assumé, pas une date.
+- Description et image sont obligatoires pour toutes les cartes.
+
 ## Fin de partie
 - Pioche épuisée : la partie continue, le joueur joue ses cartes jusqu'à
   épuisement de sa main. Une erreur de placement sur pioche vide révèle la
