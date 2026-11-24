@@ -1,2 +1,10 @@
 // use prisma-8
-// Contrat de données de Chroni. Les modèles arrivent avec les features (cards, runs).
+// Contrat de données de Chroni.
+
+model Card {
+  id        String   @id @onCreate(cuid(2))
+  title     String
+  year      Int
+  category  String?
+  createdAt DateTime @onCreate(now())
+}
