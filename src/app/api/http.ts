@@ -1,7 +1,12 @@
 import type { ZodType } from "zod";
+import { RunError } from "@/features/runs/domain/errors";
 import { toHttpError } from "@/features/runs/presentation/error-mapper";
 
 export function errorResponse(error: unknown): Response {
+  // Le client ne reçoit qu'un message générique : la cause réelle doit rester visible dans les logs serveur.
+  if (!(error instanceof RunError)) {
+    console.error("Unexpected error in route handler", error, "cause:", (error as { cause?: unknown }).cause);
+  }
   const { status, body } = toHttpError(error);
   return Response.json(body, { status });
 }
