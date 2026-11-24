@@ -6,3 +6,10 @@ next-env.d.ts
 .env.*
 !.env.example
 .DS_Store
+
+# Skills et config d'agents (générés ou locaux)
+.agents
+.claude
+.cursor
+.devin
+.pi
