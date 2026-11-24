@@ -42,6 +42,22 @@ Pour le domaine : écrire le test qui échoue, puis l'implémentation (un commit
 pour le test, un pour le code, ou un seul si je le préfère : le dire dans le
 plan).
 
+## Périmètre et sécurité (OBLIGATOIRE)
+- Rester STRICTEMENT dans le dossier du projet : ne lire, écrire, modifier
+  ni lister rien en dehors (pas de `..`, pas de `~`, pas de `/etc`, `/var`,
+  `/tmp`, `/opt`, `/Users`, ni de lien symbolique qui sorte du projet).
+- Dans le projet, les actions courantes (lecture, édition, tests, lint,
+  build) s'exécutent sans demander confirmation.
+- Demander mon accord explicite, en montrant la commande exacte, avant toute
+  action destructrice : `rm -rf`, `git push --force`, `git reset --hard`,
+  réinitialisation de la base (`prisma migrate reset`, `dropdb`),
+  suppression de migrations ou de volumes Docker.
+- Si une commande est bloquée ou refusée, ne pas la contourner (autre
+  syntaxe, autre outil, script intermédiaire) : m'expliquer le besoin.
+- Ne jamais lancer une commande dont l'effet porte hors du projet
+  (installation globale, modification de la configuration du système ou du
+  shell).
+
 ## Règles non négociables
 - La date d'une carte n'est JAMAIS envoyée au client avant que la carte soit
   jouée ou révélée.
