@@ -12,6 +12,7 @@
     "db:emit": "prisma contract emit",
     "db:update": "prisma db update",
     "db:migrate:test": "node scripts/migrate-test-db.mjs",
+    "db:seed": "NODE_ENV=development tsx scripts/seed.ts",
     "postinstall": "prisma skills sync || exit 0"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
     "eslint-config-next": "^16.4.6",
     "msw": "^3.0.7",
     "prisma": "^8.0.0-rc.35",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.74.0",
     "vitest": "^5.1.1"
