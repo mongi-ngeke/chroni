@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { Card, type CardRepository } from "@/features/cards";
 import { db } from "@/prisma/db";
-import { resetDatabase } from "../../../../tests/support/database";
+import { resetDatabase } from "@tests/support/database";
 import { PrismaCardRepository } from "@/features/cards/infrastructure/prisma-card-repository";
 import { Run } from "../domain/run";
 import { PrismaRunRepository } from "./prisma-run-repository";

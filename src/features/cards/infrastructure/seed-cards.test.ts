@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { db } from "@/prisma/db";
-import { resetDatabase } from "../../../../tests/support/database";
+import { resetDatabase } from "@tests/support/database";
 import { seedCardsInto } from "./seed-cards";
 
 beforeEach(resetDatabase);

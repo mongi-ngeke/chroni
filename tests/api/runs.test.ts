@@ -5,7 +5,7 @@ import { POST as startRun } from "@/app/api/runs/route";
 import { seedCardsInto } from "@/features/cards/infrastructure/seed-cards";
 import type { PlayResponse, RunResponse } from "@/features/runs/presentation/schemas";
 import { db } from "@/prisma/db";
-import { resetDatabase } from "../support/database";
+import { resetDatabase } from "@tests/support/database";
 
 const params = (id: string) => ({ params: Promise.resolve({ id }) });
 const jsonRequest = (body: unknown) =>

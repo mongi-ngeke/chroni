@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { db } from "@/prisma/db";
-import { resetDatabase } from "../../../../tests/support/database";
+import { resetDatabase } from "@tests/support/database";
 import { PrismaCardRepository } from "./prisma-card-repository";
 
 const repository = new PrismaCardRepository(db);
