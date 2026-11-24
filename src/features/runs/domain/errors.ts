@@ -15,3 +15,27 @@ export class NotEnoughCardsError extends RunError {
     super(`A run needs at least ${required} cards, got ${available}`);
   }
 }
+
+export class RunAlreadyWonError extends RunError {
+  readonly code = "RUN_ALREADY_WON";
+
+  constructor() {
+    super("This run is already won");
+  }
+}
+
+export class CardNotInHandError extends RunError {
+  readonly code = "CARD_NOT_IN_HAND";
+
+  constructor(cardId: string) {
+    super(`Card ${cardId} is not in the hand`);
+  }
+}
+
+export class InvalidPositionError extends RunError {
+  readonly code = "INVALID_POSITION";
+
+  constructor(position: number, timelineLength: number) {
+    super(`Position ${position} is invalid: expected an integer between 0 and ${timelineLength}`);
+  }
+}
