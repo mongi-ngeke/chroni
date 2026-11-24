@@ -22,6 +22,10 @@ export class InMemoryCardRepository implements CardRepository {
   async findAll(): Promise<Card[]> {
     return [...this.cards];
   }
+
+  async findByIds(ids: readonly string[]): Promise<Card[]> {
+    return this.cards.filter((card) => ids.includes(card.id));
+  }
 }
 
 export class SequentialIdGenerator implements IdGenerator {

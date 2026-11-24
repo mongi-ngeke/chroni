@@ -19,3 +19,5 @@ export const db = globalForDb.__chroniDb ?? createDb();
 if (env.NODE_ENV !== "production") {
   globalForDb.__chroniDb = db;
 }
+
+export type Db = typeof db;
