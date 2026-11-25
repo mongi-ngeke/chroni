@@ -6,6 +6,7 @@ next-env.d.ts
 .env.*
 !.env.example
 .DS_Store
+.ssh
 
 # Skills et config d'agents (générés ou locaux)
 .agents
