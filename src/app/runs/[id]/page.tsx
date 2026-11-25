@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { container } from "@/app/container";
+import { currentPlayer } from "@/app/current-player";
 import { getRun } from "@/features/runs/application/get-run";
 import { RunNotFoundError } from "@/features/runs/application/errors";
 import type { RunResponse } from "@/features/runs/presentation/schemas";
@@ -13,8 +14,10 @@ export const metadata: Metadata = { title: "Partie en cours · Chroni" };
 
 async function loadRun(id: string): Promise<RunResponse> {
   try {
-    // La conversion en DTO masque les dates avant qu'elles ne quittent le serveur.
-    return toRunResponse(await getRun(container, id, null));
+    // La conversion en DTO masque les dates avant qu'elles ne quittent le serveur. La partie privée
+    // d'un autre joueur est introuvable, comme une partie inexistante.
+    const player = await currentPlayer();
+    return toRunResponse(await getRun(container, id, player?.id ?? null));
   } catch (error) {
     if (error instanceof RunNotFoundError) {
       notFound();
