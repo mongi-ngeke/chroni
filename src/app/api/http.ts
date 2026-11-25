@@ -1,10 +1,11 @@
 import type { ZodType } from "zod";
+import { AUTH_ERROR_STATUS } from "@/features/auth/presentation/error-mapper";
 import { RUN_ERROR_STATUS } from "@/features/runs/presentation/error-mapper";
 import { DomainError } from "@/shared/domain-error";
 import { toHttpError } from "@/shared/http-error";
 
 /** Statut HTTP de chaque code métier, toutes features confondues. */
-const ERROR_STATUS = { ...RUN_ERROR_STATUS };
+const ERROR_STATUS = { ...RUN_ERROR_STATUS, ...AUTH_ERROR_STATUS };
 
 export function errorResponse(error: unknown): Response {
   // Le client ne reçoit qu'un message générique : la cause réelle doit rester visible dans les logs serveur.
