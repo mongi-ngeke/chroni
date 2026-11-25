@@ -83,7 +83,8 @@ migration.
 Avant de présenter un commit : `pnpm typecheck && pnpm lint && pnpm test`.
 
 ## À ne pas faire
-- Pas de fonctionnalité hors périmètre (multijoueur, comptes, classements).
+- Pas de fonctionnalité hors périmètre (multijoueur, classements). Les comptes
+  (email et mot de passe) sont permis : on joue en invité ou connecté.
 - Pas de secrets ni de fichiers `.env` dans git.
 - Pas de modification d'une migration Prisma déjà appliquée : en créer une
   nouvelle (`migrations/` est versionné, `.env` ne l'est pas).
