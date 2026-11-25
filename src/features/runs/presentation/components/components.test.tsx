@@ -179,6 +179,31 @@ describe("Timeline", () => {
     expect(html).not.toContain('disabled=""');
   });
 
+  it("shows no visual indicator between the cards, only invisible slots", () => {
+    for (const slotsEnabled of [false, true]) {
+      const html = renderToStaticMarkup(<Timeline cards={timeline} slotsEnabled={slotsEnabled} onPlace={() => {}} />);
+
+      expect(html.match(/<button[^>]*class="sr-only"/g)).toHaveLength(3);
+      expect(html).not.toContain("border-dashed");
+      expect(html).not.toContain("bg-stone-200");
+      expect(visibleText(html)).not.toContain("+");
+    }
+  });
+
+  it("invites a click on the timeline only once a card is selected", () => {
+    expect(renderToStaticMarkup(<Timeline cards={timeline} slotsEnabled onPlace={() => {}} />)).toContain("cursor-pointer");
+    expect(renderToStaticMarkup(<Timeline cards={timeline} slotsEnabled={false} onPlace={() => {}} />)).not.toContain(
+      "cursor-pointer",
+    );
+  });
+
+  it("opens no gap until a slot is targeted", () => {
+    const html = renderToStaticMarkup(<Timeline cards={timeline} slotsEnabled onPlace={() => {}} />);
+
+    expect(html).not.toContain("margin-left");
+    expect(html).not.toContain("margin-right");
+  });
+
   it("shows the dates of the cards already placed", () => {
     const html = renderToStaticMarkup(<Timeline cards={timeline} slotsEnabled={false} onPlace={() => {}} />);
 

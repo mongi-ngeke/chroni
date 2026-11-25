@@ -1,13 +1,19 @@
-import { Fragment } from "react";
+"use client";
+
+import { Fragment, useRef, useState, type MouseEvent, type PointerEvent } from "react";
+import { insertionPosition } from "../game-state";
 import type { RevealedCard } from "../schemas";
 import { CardView } from "./card-view";
 
 interface TimelineProps {
   cards: readonly RevealedCard[];
-  /** Vrai quand une carte est sélectionnée : les emplacements deviennent cliquables. */
+  /** Vrai quand une carte est sélectionnée : survoler la frise ouvre un écart, cliquer y pose la carte. */
   slotsEnabled: boolean;
   onPlace(position: number): void;
 }
+
+/** Écart ouvert entre les deux cartes voisines de l'emplacement visé. */
+const GAP = "4rem";
 
 function slotLabel(cards: readonly RevealedCard[], position: number): string {
   const before = cards[position - 1];
@@ -17,25 +23,45 @@ function slotLabel(cards: readonly RevealedCard[], position: number): string {
   return `Placer entre « ${before?.title ?? ""} » et « ${after?.title ?? ""} »`;
 }
 
-function Slot({ label, enabled, onClick }: { label: string; enabled: boolean; onClick(): void }) {
-  return (
+export function Timeline({ cards, slotsEnabled, onPlace }: TimelineProps) {
+  // Emplacement visé : au pointeur (survol) ou au clavier (focus d'un emplacement).
+  const [targeted, setTargeted] = useState<number | null>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const target = slotsEnabled ? targeted : null;
+
+  const positionAt = (pointerX: number) =>
+    insertionPosition(
+      pointerX,
+      cardRefs.current.slice(0, cards.length).flatMap((element) => {
+        if (element === null) return [];
+        const box = element.getBoundingClientRect();
+        return [box.left + box.width / 2];
+      }),
+    );
+
+  const place = (position: number) => {
+    setTargeted(null);
+    onPlace(position);
+  };
+
+  // Emplacements sans indicateur visuel : des boutons invisibles gardent la frise utilisable au
+  // clavier et par les lecteurs d'écran ; leur focus ouvre l'écart, qui tient lieu d'indicateur.
+  const slot = (position: number) => (
     <button
       type="button"
-      disabled={!enabled}
-      aria-label={label}
-      onClick={onClick}
-      className={
-        enabled
-          ? "flex min-h-40 w-10 shrink-0 self-stretch items-center justify-center rounded-lg border-2 border-dashed border-amber-500 bg-amber-50 text-2xl font-bold text-amber-600 transition hover:bg-amber-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-          : "w-3 shrink-0 cursor-default self-stretch rounded bg-stone-200"
-      }
-    >
-      {enabled ? "+" : null}
-    </button>
+      disabled={!slotsEnabled}
+      aria-label={slotLabel(cards, position)}
+      onFocus={() => setTargeted(position)}
+      onBlur={() => setTargeted(null)}
+      onClick={(event) => {
+        // Le clic remonterait jusqu'à la frise, qui poserait la carte une seconde fois.
+        event.stopPropagation();
+        place(position);
+      }}
+      className="sr-only"
+    />
   );
-}
 
-export function Timeline({ cards, slotsEnabled, onPlace }: TimelineProps) {
   return (
     // Toute la largeur de l'écran, comme la main : la frise sort de la colonne centrée.
     <div
@@ -44,21 +70,39 @@ export function Timeline({ cards, slotsEnabled, onPlace }: TimelineProps) {
       aria-label="Frise chronologique"
     >
       {/* `mx-auto w-max` et non `justify-center` : centrée tant qu'elle tient, la frise reste
-          entièrement accessible au défilement quand elle déborde (pas de début coupé à gauche). */}
-      <div className="mx-auto flex w-max items-stretch gap-1 px-1">
+          entièrement accessible au défilement quand elle déborde (pas de début coupé à gauche).
+          Le clic sur une carte de la frise est un raccourci souris et tactile : le clavier passe
+          par les emplacements. */}
+      <div
+        className={`mx-auto flex w-max items-stretch gap-3 px-1 ${slotsEnabled ? "cursor-pointer" : ""}`}
+        onPointerMove={slotsEnabled ? (event: PointerEvent) => setTargeted(positionAt(event.clientX)) : undefined}
+        onPointerLeave={() => setTargeted(null)}
+        onClick={slotsEnabled ? (event: MouseEvent) => place(positionAt(event.clientX)) : undefined}
+      >
         {cards.map((card, index) => (
           <Fragment key={card.id}>
-            <Slot label={slotLabel(cards, index)} enabled={slotsEnabled} onClick={() => onPlace(index)} />
-            <CardView
-              title={card.title}
-              category={card.category}
-              description={card.description}
-              image={card.image}
-              year={card.year}
-            />
+            {slot(index)}
+            <div
+              ref={(element) => {
+                cardRefs.current[index] = element;
+              }}
+              className="flex transition-[margin] duration-200"
+              style={{
+                marginLeft: target === index ? GAP : undefined,
+                marginRight: target === cards.length && index === cards.length - 1 ? GAP : undefined,
+              }}
+            >
+              <CardView
+                title={card.title}
+                category={card.category}
+                description={card.description}
+                image={card.image}
+                year={card.year}
+              />
+            </div>
           </Fragment>
         ))}
-        <Slot label={slotLabel(cards, cards.length)} enabled={slotsEnabled} onClick={() => onPlace(cards.length)} />
+        {slot(cards.length)}
       </div>
     </div>
   );
