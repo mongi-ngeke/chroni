@@ -87,6 +87,12 @@ describe("Hand", () => {
     expect(html).not.toContain("flex-wrap");
   });
 
+  it("spans the full viewport width", () => {
+    const html = renderToStaticMarkup(<Hand cards={hand} selectedCardId={null} disabled={false} onSelect={() => {}} />);
+
+    expect(html).toContain("w-screen");
+  });
+
   it("disables the cards while a play is pending", () => {
     const html = renderToStaticMarkup(<Hand cards={hand} selectedCardId={null} disabled onSelect={() => {}} />);
 

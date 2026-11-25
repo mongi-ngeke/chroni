@@ -9,9 +9,10 @@ interface HandProps {
 }
 
 export function Hand({ cards, selectedCardId, disabled, onSelect }: HandProps) {
-  // Une seule ligne, défilable comme la frise ; `pt-1` laisse la place à l'effet de survol.
+  // Une seule ligne, défilable, sur toute la largeur de l'écran (elle sort de la colonne centrée) ;
+  // `pt-1` laisse la place à l'effet de survol.
   return (
-    <div className="overflow-x-auto pt-1 pb-3">
+    <div className="ml-[calc(50%-50vw)] w-screen overflow-x-auto px-4 pt-1 pb-3 sm:px-8">
       <ul className="flex w-max items-stretch gap-3" aria-label="Votre main">
         {cards.map((card) => (
           <li key={card.id} className="flex">
