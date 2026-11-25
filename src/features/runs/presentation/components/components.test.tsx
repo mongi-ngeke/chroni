@@ -5,6 +5,7 @@ import { CardView } from "./card-view";
 import { GameBoard } from "./game-board";
 import { Hand } from "./hand";
 import { PlayFeedback } from "./play-feedback";
+import { SidePanel } from "./side-panel";
 import { Timeline } from "./timeline";
 import { hidden, revealed } from "@tests/support/dto";
 
@@ -156,6 +157,30 @@ describe("PlayFeedback", () => {
     expect(html).toContain('role="status"');
     expect(html).toContain("Raté");
     expect(html).toContain("1500");
+  });
+});
+
+describe("SidePanel", () => {
+  const html = renderToStaticMarkup(
+    <SidePanel>
+      <p>Contenu du volet</p>
+    </SidePanel>,
+  );
+
+  it("starts closed, with a burger button bound to the panel", () => {
+    expect(html).toContain('aria-label="Ouvrir le menu"');
+    expect(html).toContain('aria-expanded="false"');
+    expect(html).toContain('aria-controls="side-panel"');
+    expect(html).toContain('id="side-panel"');
+  });
+
+  it("keeps the closed panel out of the focus order and off screen", () => {
+    expect(html).toMatch(/<aside[^>]*inert=""/);
+    expect(html).toContain("-translate-x-full");
+  });
+
+  it("renders its content", () => {
+    expect(html).toContain("Contenu du volet");
   });
 });
 
