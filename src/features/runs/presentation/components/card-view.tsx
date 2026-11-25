@@ -26,7 +26,7 @@ export function CardView({ title, category, description, image, year, selected =
         {/* `unoptimized` : le navigateur charge directement la miniature Wikimedia (déjà dimensionnée).
             L'optimiseur de Next la téléchargerait côté serveur, depuis une seule IP, et Wikimedia
             répond 429 dès qu'une main de 10 cartes est demandée d'un coup. */}
-        <Image src={image.url} alt={image.alt} fill sizes="256px" unoptimized className="object-cover" />
+        <Image src={image.url} alt={image.alt} fill sizes="256px" unoptimized className="object-cover object-top" />
       </div>
       <div className="flex flex-1 flex-col gap-2 p-3">
         <div>

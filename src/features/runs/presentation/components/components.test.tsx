@@ -53,6 +53,12 @@ describe("CardView", () => {
     expect(html).toContain("Une description complète de la carte, affichée en entier.");
   });
 
+  it("anchors the cropped image to its top edge", () => {
+    const html = renderToStaticMarkup(<CardView title="Alpha" {...content} />);
+
+    expect(html).toMatch(/<img[^>]*class="[^"]*object-top/);
+  });
+
   it("shows no date line at all when there is no year", () => {
     const html = renderToStaticMarkup(<CardView title="Alpha" {...content} />);
 
