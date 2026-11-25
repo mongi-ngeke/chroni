@@ -50,7 +50,7 @@ export function SidePanel({ children }: { children: ReactNode }) {
         id={PANEL_ID}
         aria-label="Menu de la partie"
         inert={!open}
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col gap-4 overflow-y-auto bg-white/95 p-5 shadow-xl transition-transform duration-200 ${open ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col gap-4 overflow-y-auto bg-white p-5 shadow-xl transition-transform duration-200 ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
         <button
           type="button"
