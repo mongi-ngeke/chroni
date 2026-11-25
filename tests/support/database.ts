@@ -26,3 +26,8 @@ export async function insertCard(input: CardRowInput) {
     imageCredit: "Auteur de test — CC0, via Wikimedia Commons",
   });
 }
+
+/** Insère un compte en base (empreinte factice : à n'utiliser que là où le mot de passe ne compte pas). */
+export async function insertUser(id: string, email = `${id}@example.org`) {
+  return db.orm.public.User.create({ id, email, passwordHash: "scrypt$test" });
+}

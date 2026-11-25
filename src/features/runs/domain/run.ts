@@ -14,6 +14,8 @@ export interface StartRunInput {
   id: string;
   cards: readonly Card[];
   shuffle: Shuffle;
+  /** Joueur connecté qui lance la partie ; absent (ou `null`) pour une partie d'invité. */
+  ownerId?: string | null;
 }
 
 export interface PlayCardInput {
@@ -34,6 +36,8 @@ export interface PlayResult {
 export interface RunState {
   id: string;
   status: RunStatus;
+  /** Absent (ou `null`) : partie d'invité. */
+  ownerId?: string | null;
   timeline: readonly Card[];
   hand: readonly Card[];
   drawPile: readonly Card[];
@@ -44,6 +48,8 @@ export class Run {
   private constructor(
     readonly id: string,
     readonly status: RunStatus,
+    /** Propriétaire : la partie est privée. `null` : partie d'invité, ouverte à qui a son URL. */
+    readonly ownerId: string | null,
     /** Cartes posées, dans l'ordre chronologique. */
     readonly timeline: readonly Card[],
     /** Main du joueur : l'ordre n'a pas de sens métier. */
@@ -53,7 +59,7 @@ export class Run {
     readonly discard: readonly Card[],
   ) {}
 
-  static start({ id, cards, shuffle }: StartRunInput): Run {
+  static start({ id, cards, shuffle, ownerId = null }: StartRunInput): Run {
     if (cards.length < MIN_CARDS) {
       throw new NotEnoughCardsError(MIN_CARDS, cards.length);
     }
@@ -61,12 +67,28 @@ export class Run {
     if (first === undefined) {
       throw new NotEnoughCardsError(MIN_CARDS, 0);
     }
-    return new Run(id, "in_progress", [first], rest.slice(0, HAND_SIZE), rest.slice(HAND_SIZE), []);
+    return new Run(id, "in_progress", ownerId, [first], rest.slice(0, HAND_SIZE), rest.slice(HAND_SIZE), []);
   }
 
   /** Reconstitue un run déjà démarré (lecture depuis la persistance). */
   static restore(state: RunState): Run {
-    return new Run(state.id, state.status, state.timeline, state.hand, state.drawPile, state.discard);
+    return new Run(
+      state.id,
+      state.status,
+      state.ownerId ?? null,
+      state.timeline,
+      state.hand,
+      state.drawPile,
+      state.discard,
+    );
+  }
+
+  /**
+   * Une partie d'invité est ouverte à tous ; une partie avec propriétaire n'est accessible qu'à lui
+   * (`playerId` : joueur connecté, ou `null` pour un invité).
+   */
+  isAccessibleBy(playerId: string | null): boolean {
+    return this.ownerId === null || this.ownerId === playerId;
   }
 
   playCard({ cardId, position }: PlayCardInput): PlayResult {
@@ -104,11 +126,12 @@ export class Run {
     return (left === undefined || left.year <= card.year) && (right === undefined || card.year <= right.year);
   }
 
-  private next(changes: Partial<Omit<RunState, "id" | "status">>): Run {
+  private next(changes: Partial<Omit<RunState, "id" | "status" | "ownerId">>): Run {
     const hand = changes.hand ?? this.hand;
     return new Run(
       this.id,
       hand.length === 0 ? "won" : this.status,
+      this.ownerId,
       changes.timeline ?? this.timeline,
       hand,
       changes.drawPile ?? this.drawPile,

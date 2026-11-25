@@ -59,3 +59,39 @@ describe("Run.start", () => {
     );
   });
 });
+
+describe("Run ownership", () => {
+  const cards = makeCards(12);
+
+  it("starts as a guest run unless an owner is given", () => {
+    expect(Run.start({ id: "run-1", cards, shuffle: identity }).ownerId).toBeNull();
+    expect(Run.start({ id: "run-1", cards, shuffle: identity, ownerId: "user-1" }).ownerId).toBe("user-1");
+  });
+
+  it("opens a guest run to everybody", () => {
+    const run = Run.start({ id: "run-1", cards, shuffle: identity });
+
+    expect(run.isAccessibleBy(null)).toBe(true);
+    expect(run.isAccessibleBy("user-1")).toBe(true);
+  });
+
+  it("keeps a private run to its owner only", () => {
+    const run = Run.start({ id: "run-1", cards, shuffle: identity, ownerId: "user-1" });
+
+    expect(run.isAccessibleBy("user-1")).toBe(true);
+    expect(run.isAccessibleBy("user-2")).toBe(false);
+    expect(run.isAccessibleBy(null)).toBe(false);
+  });
+
+  it("keeps its owner after a play and after a restore", () => {
+    const run = Run.start({ id: "run-1", cards, shuffle: identity, ownerId: "user-1" });
+    const card = run.hand[0];
+    if (card === undefined) throw new Error("empty hand");
+
+    const played = run.playCard({ cardId: card.id, position: 1 }).run;
+
+    expect(played.ownerId).toBe("user-1");
+    expect(Run.restore({ ...played, ownerId: played.ownerId }).ownerId).toBe("user-1");
+    expect(Run.restore({ ...played, ownerId: undefined }).ownerId).toBeNull();
+  });
+});

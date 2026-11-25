@@ -5,7 +5,7 @@ import { errorResponse } from "../http";
 
 export async function POST(): Promise<Response> {
   try {
-    const run = await startRun(container);
+    const run = await startRun(container, null);
     return Response.json(toRunResponse(run), { status: 201 });
   } catch (error) {
     return errorResponse(error);

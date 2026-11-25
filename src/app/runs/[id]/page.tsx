@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Partie en cours · Chroni" };
 async function loadRun(id: string): Promise<RunResponse> {
   try {
     // La conversion en DTO masque les dates avant qu'elles ne quittent le serveur.
-    return toRunResponse(await getRun(container, id));
+    return toRunResponse(await getRun(container, id, null));
   } catch (error) {
     if (error instanceof RunNotFoundError) {
       notFound();

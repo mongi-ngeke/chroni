@@ -11,7 +11,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       return parsed.error;
     }
     const { id } = await context.params;
-    const result = await playCard(container, { runId: id, ...parsed.data });
+    const result = await playCard(container, { runId: id, playerId: null, ...parsed.data });
     return Response.json(toPlayResponse(result));
   } catch (error) {
     return errorResponse(error);

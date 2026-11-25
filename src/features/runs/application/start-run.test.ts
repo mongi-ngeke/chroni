@@ -25,7 +25,7 @@ describe("startRun", () => {
   it("starts a run from all cards with the injected shuffle and id", async () => {
     const { deps } = setup(100);
 
-    const run = await startRun(deps);
+    const run = await startRun(deps, null);
 
     expect(run.id).toBe("run-1");
     expect(run.timeline.map((c) => c.id)).toEqual(["card-100"]);
@@ -36,15 +36,22 @@ describe("startRun", () => {
   it("persists the run", async () => {
     const { runs, deps } = setup(100);
 
-    const run = await startRun(deps);
+    const run = await startRun(deps, null);
 
     expect(await runs.findById(run.id)).toBe(run);
+  });
+
+  it("starts a guest run without a player, and a private run for a logged-in player", async () => {
+    const { deps } = setup(100);
+
+    expect((await startRun(deps, null)).ownerId).toBeNull();
+    expect((await startRun(deps, "user-1")).ownerId).toBe("user-1");
   });
 
   it("fails without persisting when there are not enough cards", async () => {
     const { runs, deps } = setup(10);
 
-    await expect(startRun(deps)).rejects.toThrow(NotEnoughCardsError);
+    await expect(startRun(deps, null)).rejects.toThrow(NotEnoughCardsError);
     expect(runs.saved.size).toBe(0);
   });
 });

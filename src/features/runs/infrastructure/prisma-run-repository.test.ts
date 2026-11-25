@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { Card, type CardRepository } from "@/features/cards";
 import { db } from "@/prisma/db";
-import { insertCard, resetDatabase } from "@tests/support/database";
+import { insertCard, insertUser, resetDatabase } from "@tests/support/database";
 import { PrismaCardRepository } from "@/features/cards/infrastructure/prisma-card-repository";
 import { Run } from "../domain/run";
 import { PrismaRunRepository } from "./prisma-run-repository";
@@ -85,5 +85,28 @@ describe("PrismaRunRepository", () => {
     const b = await repository.findById("b");
 
     expect(a?.timeline[0]?.id).not.toBe(b?.timeline[0]?.id);
+  });
+
+  it("stores a guest run without owner and a private run with its owner", async () => {
+    const cards = await seedCards(11);
+    await insertUser("user-1");
+    await repository.save(Run.start({ id: "guest", cards, shuffle: keepOrder }));
+    await repository.save(Run.start({ id: "private", cards, shuffle: keepOrder, ownerId: "user-1" }));
+
+    expect((await repository.findById("guest"))?.ownerId).toBeNull();
+    expect((await repository.findById("private"))?.ownerId).toBe("user-1");
+  });
+
+  it("keeps the owner when the run is saved again", async () => {
+    const cards = (await seedCards(12)).sort((a, b) => a.year - b.year);
+    await insertUser("user-1");
+    const run = Run.start({ id: "private", cards, shuffle: keepOrder, ownerId: "user-1" });
+    await repository.save(run);
+    const card = run.hand[0];
+    if (card === undefined) throw new Error("empty hand");
+
+    await repository.save(run.playCard({ cardId: card.id, position: 1 }).run);
+
+    expect((await repository.findById("private"))?.ownerId).toBe("user-1");
   });
 });

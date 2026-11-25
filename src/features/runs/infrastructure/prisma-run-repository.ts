@@ -34,7 +34,8 @@ export class PrismaRunRepository implements RunRepository {
   async save(run: Run): Promise<void> {
     await this.db.transaction(async (tx) => {
       await tx.orm.public.Run.upsert({
-        create: { id: run.id, status: run.status },
+        // Le propriétaire est fixé à la création : une partie ne change jamais de main.
+        create: { id: run.id, status: run.status, userId: run.ownerId },
         update: { status: run.status },
       });
       // Le run est petit (≤ 100 cartes) : on réécrit son état d'un bloc, sans conflit de position.
@@ -67,6 +68,7 @@ export class PrismaRunRepository implements RunRepository {
     return Run.restore({
       id,
       status: row.status,
+      ownerId: row.userId,
       timeline: inZone("timeline"),
       hand: inZone("hand"),
       drawPile: inZone("draw_pile"),
