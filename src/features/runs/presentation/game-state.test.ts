@@ -263,7 +263,7 @@ describe("fanPosition", () => {
   it("keeps the whole fan within its maximal spread, however many cards", () => {
     for (const count of [2, 5, 10, 20]) {
       const spread = fanPosition(count - 1, count).angle - fanPosition(0, count).angle;
-      expect(spread).toBeLessThanOrEqual(36);
+      expect(spread).toBeLessThanOrEqual(24);
     }
     // Peu de cartes : l'écart entre voisines est plafonné, l'éventail reste serré.
     expect(fanPosition(1, 2).angle - fanPosition(0, 2).angle).toBe(4);

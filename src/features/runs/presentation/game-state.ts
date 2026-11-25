@@ -127,11 +127,12 @@ export function cardCount(count: number): string {
   return count > 1 ? `${count} cartes` : `${count} carte`;
 }
 
-/** Écart maximal entre deux cartes voisines de l'éventail, et ouverture totale maximale (degrés). */
+/** Écart maximal entre deux cartes voisines de l'éventail, et ouverture totale maximale (degrés) : resserrée,
+    car des cartes hautes très inclinées déborderaient de l'écran. */
 const FAN_MAX_STEP = 4;
-const FAN_MAX_SPREAD = 36;
+const FAN_MAX_SPREAD = 24;
 /** Descente des cartes vers les bords de l'éventail, en pixels par rang au carré. */
-const FAN_DROP = 3;
+const FAN_DROP = 2;
 
 export interface FanPosition {
   /** Rotation de la carte autour de son bord inférieur, en degrés (négatif à gauche). */

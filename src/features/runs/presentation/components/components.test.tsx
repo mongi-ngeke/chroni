@@ -114,8 +114,31 @@ describe("Hand", () => {
     const html = renderToStaticMarkup(<Hand cards={hand} selectedCardId={null} disabled={false} onSelect={() => {}} />);
 
     expect(html).toContain("items-stretch");
-    expect(html.match(/<li class="flex">/g)).toHaveLength(2);
+    expect(html.match(/<li class="relative flex /g)).toHaveLength(2);
     expect(html.match(/<button[^>]*class="flex /g)).toHaveLength(2);
+  });
+
+  it("fans the cards out: tilted around their bottom edge and overlapping", () => {
+    const three = [...hand, hidden("h3", "Gamma")];
+    const html = renderToStaticMarkup(<Hand cards={three} selectedCardId={null} disabled={false} onSelect={() => {}} />);
+    const transforms = [...html.matchAll(/transform:([^;"]+)/g)].map((match) => match[1]);
+
+    expect(transforms).toEqual([
+      "translateY(2px) rotate(-4deg)",
+      "translateY(0px) rotate(0deg)",
+      "translateY(2px) rotate(4deg)",
+    ]);
+    expect(html).toContain("origin-bottom");
+    // Chaque carte sauf la première recouvre sa voisine de gauche.
+    expect(html).toContain("not-first:ml-(--fan-overlap)");
+    expect(html).toContain("--fan-overlap:calc(-1 * (16rem - max(28px, min(120px, (100vw - 4rem - 12rem - 16rem) / 2))))");
+  });
+
+  it("brings the selected card to the front and lifts it", () => {
+    const html = renderToStaticMarkup(<Hand cards={hand} selectedCardId="h2" disabled={false} onSelect={() => {}} />);
+
+    expect(html.match(/z-index:30/g)).toHaveLength(1);
+    expect(html).toMatch(/z-index:30[^>]*>\s*<button[^>]*aria-pressed="true"[^>]*-translate-y-8/);
   });
 
   it("disables the cards while a play is pending", () => {
