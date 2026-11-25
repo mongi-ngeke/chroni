@@ -122,6 +122,14 @@ describe("Timeline", () => {
     expect(html.match(/disabled=""/g)).toHaveLength(3);
   });
 
+  it("centres its cards without clipping the start when it overflows", () => {
+    const html = renderToStaticMarkup(<Timeline cards={timeline} slotsEnabled={false} onPlace={() => {}} />);
+
+    expect(html).toContain("mx-auto");
+    expect(html).toContain("w-max");
+    expect(html).not.toContain("justify-center");
+  });
+
   it("labels the slots for assistive technologies", () => {
     const html = renderToStaticMarkup(<Timeline cards={timeline} slotsEnabled onPlace={() => {}} />);
 
