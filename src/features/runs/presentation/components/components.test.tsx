@@ -79,6 +79,13 @@ describe("Hand", () => {
     expect(html).toContain('aria-pressed="false"');
   });
 
+  it("lays the cards out on a single scrollable row", () => {
+    const html = renderToStaticMarkup(<Hand cards={hand} selectedCardId={null} disabled={false} onSelect={() => {}} />);
+
+    expect(html).toContain("overflow-x-auto");
+    expect(html).not.toContain("flex-wrap");
+  });
+
   it("disables the cards while a play is pending", () => {
     const html = renderToStaticMarkup(<Hand cards={hand} selectedCardId={null} disabled onSelect={() => {}} />);
 
