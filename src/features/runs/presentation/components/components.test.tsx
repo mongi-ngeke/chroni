@@ -133,6 +133,12 @@ describe("Timeline", () => {
     expect(html.match(/disabled=""/g)).toHaveLength(3);
   });
 
+  it("spans the full viewport width", () => {
+    const html = renderToStaticMarkup(<Timeline cards={timeline} slotsEnabled={false} onPlace={() => {}} />);
+
+    expect(html).toMatch(/<div[^>]*class="[^"]*w-screen[^"]*"[^>]*aria-label="Frise chronologique"/);
+  });
+
   it("centres its cards without clipping the start when it overflows", () => {
     const html = renderToStaticMarkup(<Timeline cards={timeline} slotsEnabled={false} onPlace={() => {}} />);
 

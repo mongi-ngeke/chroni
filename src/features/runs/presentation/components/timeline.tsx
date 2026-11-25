@@ -37,7 +37,12 @@ function Slot({ label, enabled, onClick }: { label: string; enabled: boolean; on
 
 export function Timeline({ cards, slotsEnabled, onPlace }: TimelineProps) {
   return (
-    <div className="overflow-x-auto pb-3" role="group" aria-label="Frise chronologique">
+    // Toute la largeur de l'écran, comme la main : la frise sort de la colonne centrée.
+    <div
+      className="ml-[calc(50%-50vw)] w-screen overflow-x-auto px-4 pb-3 sm:px-8"
+      role="group"
+      aria-label="Frise chronologique"
+    >
       {/* `mx-auto w-max` et non `justify-center` : centrée tant qu'elle tient, la frise reste
           entièrement accessible au défilement quand elle déborde (pas de début coupé à gauche). */}
       <div className="mx-auto flex w-max items-stretch gap-1 px-1">
