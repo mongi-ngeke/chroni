@@ -64,21 +64,20 @@ export function Timeline({ cards, slotsEnabled, onPlace }: TimelineProps) {
 
   return (
     // Toute la largeur de l'écran, comme la main : la frise sort de la colonne centrée.
+    // Survol et clic sur toute cette largeur : le vide à gauche de la première carte et à droite de
+    // la dernière vise les extrémités de la frise. Le clic est un raccourci souris et tactile : le
+    // clavier passe par les emplacements.
     <div
-      className="ml-[calc(50%-50vw)] w-screen overflow-x-auto px-4 pb-3 sm:px-8"
+      className={`ml-[calc(50%-50vw)] w-screen overflow-x-auto px-4 pb-3 sm:px-8 ${slotsEnabled ? "cursor-pointer" : ""}`}
       role="group"
       aria-label="Frise chronologique"
+      onPointerMove={slotsEnabled ? (event: PointerEvent) => setTargeted(positionAt(event.clientX)) : undefined}
+      onPointerLeave={() => setTargeted(null)}
+      onClick={slotsEnabled ? (event: MouseEvent) => place(positionAt(event.clientX)) : undefined}
     >
       {/* `mx-auto w-max` et non `justify-center` : centrée tant qu'elle tient, la frise reste
-          entièrement accessible au défilement quand elle déborde (pas de début coupé à gauche).
-          Le clic sur une carte de la frise est un raccourci souris et tactile : le clavier passe
-          par les emplacements. */}
-      <div
-        className={`mx-auto flex w-max items-stretch gap-3 px-1 ${slotsEnabled ? "cursor-pointer" : ""}`}
-        onPointerMove={slotsEnabled ? (event: PointerEvent) => setTargeted(positionAt(event.clientX)) : undefined}
-        onPointerLeave={() => setTargeted(null)}
-        onClick={slotsEnabled ? (event: MouseEvent) => place(positionAt(event.clientX)) : undefined}
-      >
+          entièrement accessible au défilement quand elle déborde (pas de début coupé à gauche). */}
+      <div className="mx-auto flex w-max items-stretch gap-3 px-1">
         {cards.map((card, index) => (
           <Fragment key={card.id}>
             {slot(index)}

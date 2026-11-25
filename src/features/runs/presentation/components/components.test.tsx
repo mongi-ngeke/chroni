@@ -191,7 +191,10 @@ describe("Timeline", () => {
   });
 
   it("invites a click on the timeline only once a card is selected", () => {
-    expect(renderToStaticMarkup(<Timeline cards={timeline} slotsEnabled onPlace={() => {}} />)).toContain("cursor-pointer");
+    // Sur toute la largeur de l'écran, bords compris, et pas seulement sur la rangée de cartes.
+    expect(renderToStaticMarkup(<Timeline cards={timeline} slotsEnabled onPlace={() => {}} />)).toMatch(
+      /<div[^>]*class="[^"]*w-screen[^"]*cursor-pointer[^"]*"[^>]*aria-label="Frise chronologique"/,
+    );
     expect(renderToStaticMarkup(<Timeline cards={timeline} slotsEnabled={false} onPlace={() => {}} />)).not.toContain(
       "cursor-pointer",
     );
