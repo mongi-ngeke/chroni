@@ -38,11 +38,7 @@ export function CardView({ title, category, description, image, year, selected =
           <p className="text-sm font-semibold leading-snug">{title}</p>
         </div>
         <p className="text-xs leading-relaxed text-stone-600">{description}</p>
-        {year === undefined ? (
-          <p className="mt-auto pt-1 text-xl font-bold text-stone-300" aria-label="Date cachée">
-            ????
-          </p>
-        ) : (
+        {year !== undefined && (
           <p className={`mt-auto pt-1 text-xl font-bold ${missed ? "text-red-700" : "text-amber-700"}`}>
             {formatYear(year)}
           </p>

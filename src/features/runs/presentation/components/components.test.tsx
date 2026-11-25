@@ -53,11 +53,12 @@ describe("CardView", () => {
     expect(html).toContain("Une description complète de la carte, affichée en entier.");
   });
 
-  it("shows a hidden date placeholder when there is no year", () => {
+  it("shows no date line at all when there is no year", () => {
     const html = renderToStaticMarkup(<CardView title="Alpha" {...content} />);
 
-    expect(html).toContain("????");
-    expect(html).toContain("Date cachée");
+    expect(html).not.toContain("????");
+    expect(html).not.toContain("Date cachée");
+    expect(html).not.toContain("text-xl");
   });
 
   it("formats a revealed year, including before the common era", () => {
