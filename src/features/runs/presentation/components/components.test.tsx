@@ -54,6 +54,16 @@ describe("CardView", () => {
     expect(html).toContain("Une description complète de la carte, affichée en entier.");
   });
 
+  it("overlays the category, the title and the date on the image, above the description", () => {
+    const html = renderToStaticMarkup(<CardView title="Bastille" category="historical" year={1789} {...content} />);
+    const overImage = html.slice(html.indexOf("<img"), html.indexOf(content.description));
+
+    expect(overImage).toContain("Histoire");
+    expect(overImage).toContain("Bastille");
+    expect(overImage).toContain("1789");
+    expect(overImage.match(/absolute/g)?.length).toBeGreaterThanOrEqual(2);
+  });
+
   it("anchors the cropped image to its top edge", () => {
     const html = renderToStaticMarkup(<CardView title="Alpha" {...content} />);
 
@@ -65,7 +75,7 @@ describe("CardView", () => {
 
     expect(html).not.toContain("????");
     expect(html).not.toContain("Date cachée");
-    expect(html).not.toContain("text-xl");
+    expect(html).not.toContain("bg-amber-700");
   });
 
   it("formats a revealed year, including before the common era", () => {
