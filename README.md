@@ -3,7 +3,7 @@
 Jeu solo de frise chronologique : replacez des événements historiques et culturels dans le bon
 ordre, sans connaître leur date.
 
-![Une partie de Chroni : la frise en haut, la main du joueur en bas, une carte sélectionnée](docs/images/chroni-partie.jpg)
+![Une partie de Chroni : la frise datée en haut, avec un écart ouvert là où la carte va être posée ; la main en éventail en bas, la carte sélectionnée soulevée au premier plan](docs/images/chroni-partie.jpg)
 
 ## Objectif fonctionnel
 
@@ -23,6 +23,8 @@ erreur écarte alors la carte sans repioche.
 On joue **en invité**, sans compte : la partie est accessible à qui a son adresse. On peut aussi
 **créer un compte** (email et mot de passe) : les parties lancées en étant connecté sont privées,
 seul leur propriétaire peut les voir et les jouer.
+
+![L'accueil de Chroni : les règles en bref, le bouton « Jouer en invité » et les boutons « Se connecter » et « Créer un compte » pour des parties privées](docs/images/chroni-accueil.jpg)
 
 **Règle non négociable :** la date d'une carte n'est jamais envoyée au navigateur avant que la
 carte soit jouée ou révélée. Les descriptions et les images, visibles dès la main, ne la
