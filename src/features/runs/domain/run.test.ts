@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { Card } from "@/features/cards";
+import type { Card } from "@/features/cards";
+import { buildCard } from "@tests/support/cards";
 import { NotEnoughCardsError } from "./errors";
 import { Run, type Shuffle } from "./run";
 
@@ -8,7 +9,7 @@ const reverse: Shuffle = (items) => [...items].reverse();
 
 function makeCards(count: number): Card[] {
   return Array.from({ length: count }, (_, index) =>
-    Card.create({ id: `card-${index + 1}`, title: `Event ${index + 1}`, year: 1000 + index }),
+    buildCard({ id: `card-${index + 1}`, year: 1000 + index }),
   );
 }
 

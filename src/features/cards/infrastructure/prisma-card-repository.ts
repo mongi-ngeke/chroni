@@ -7,11 +7,22 @@ interface CardRow {
   title: string;
   year: number;
   category: string | null;
+  description: string;
+  imageUrl: string;
+  imageAlt: string;
+  imageCredit: string;
 }
 
 // Les modèles Prisma ne sortent pas de l'infrastructure : on les convertit ici.
 function toDomain(row: CardRow): Card {
-  return Card.create({ id: row.id, title: row.title, year: row.year, category: row.category ?? undefined });
+  return Card.create({
+    id: row.id,
+    title: row.title,
+    year: row.year,
+    category: row.category ?? undefined,
+    description: row.description,
+    image: { url: row.imageUrl, alt: row.imageAlt, credit: row.imageCredit },
+  });
 }
 
 export class PrismaCardRepository implements CardRepository {

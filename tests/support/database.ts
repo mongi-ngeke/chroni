@@ -4,3 +4,25 @@ import { db } from "@/prisma/db";
 export async function resetDatabase(): Promise<void> {
   await db.execute(db.raw.sql`TRUNCATE TABLE "RunCard", "Run", "Card" CASCADE`.affectedCount().build());
 }
+
+interface CardRowInput {
+  id: string;
+  year: number;
+  title?: string;
+  category?: string;
+  description?: string;
+}
+
+/** Insère une carte valide en base ; seuls `id` et `year` sont obligatoires. */
+export async function insertCard(input: CardRowInput) {
+  return db.orm.public.Card.create({
+    id: input.id,
+    title: input.title ?? `Event ${input.id}`,
+    year: input.year,
+    ...(input.category === undefined ? {} : { category: input.category }),
+    description: input.description ?? "Une description de test, sans aucune date.",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Example.jpg/960px-Example.jpg",
+    imageAlt: "Image de test",
+    imageCredit: "Auteur de test — CC0, via Wikimedia Commons",
+  });
+}

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { Card } from "@/features/cards";
+import { buildCard } from "@tests/support/cards";
 import { CardNotInHandError } from "../domain/errors";
 import { Run } from "../domain/run";
 import { RunNotFoundError } from "./errors";
@@ -7,7 +7,7 @@ import { getRun } from "./get-run";
 import { playCard } from "./play-card";
 import { InMemoryRunRepository } from "./testing/in-memory";
 
-const card = (id: string, year: number) => Card.create({ id, title: `Event ${id}`, year });
+const card = (id: string, year: number) => buildCard({ id, year });
 
 let runs: InMemoryRunRepository;
 let initial: Run;

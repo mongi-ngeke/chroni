@@ -1,0 +1,334 @@
+[
+  {
+    "id": "column.Card.description",
+    "label": "Add column description to Card",
+    "summary": "Adds column description to table Card",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Card"
+      }
+    },
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "ensure column \"description\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "description"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"description\" on \"Card\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"description\"",
+        "sql": "ALTER TABLE \"public\".\"Card\" ADD COLUMN \"description\" text DEFAULT ('') NOT NULL"
+      },
+      {
+        "description": "drop temporary default from column \"description\"",
+        "sql": "ALTER TABLE \"public\".\"Card\" ALTER COLUMN \"description\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"description\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "description"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"description\" on \"Card\""
+        }
+      },
+      {
+        "description": "verify column \"description\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "description",
+          "NO"
+        ]
+      },
+      {
+        "description": "verify column \"description\" has no default after temporary default removal",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NOT NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "description"
+        ]
+      },
+      {
+        "description": "verify column \"description\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "description",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.Card.imageAlt",
+    "label": "Add column imageAlt to Card",
+    "summary": "Adds column imageAlt to table Card",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Card"
+      }
+    },
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "ensure column \"imageAlt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageAlt"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"imageAlt\" on \"Card\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"imageAlt\"",
+        "sql": "ALTER TABLE \"public\".\"Card\" ADD COLUMN \"imageAlt\" text DEFAULT ('') NOT NULL"
+      },
+      {
+        "description": "drop temporary default from column \"imageAlt\"",
+        "sql": "ALTER TABLE \"public\".\"Card\" ALTER COLUMN \"imageAlt\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"imageAlt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageAlt"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"imageAlt\" on \"Card\""
+        }
+      },
+      {
+        "description": "verify column \"imageAlt\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageAlt",
+          "NO"
+        ]
+      },
+      {
+        "description": "verify column \"imageAlt\" has no default after temporary default removal",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NOT NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageAlt"
+        ]
+      },
+      {
+        "description": "verify column \"imageAlt\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageAlt",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.Card.imageCredit",
+    "label": "Add column imageCredit to Card",
+    "summary": "Adds column imageCredit to table Card",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Card"
+      }
+    },
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "ensure column \"imageCredit\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageCredit"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"imageCredit\" on \"Card\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"imageCredit\"",
+        "sql": "ALTER TABLE \"public\".\"Card\" ADD COLUMN \"imageCredit\" text DEFAULT ('') NOT NULL"
+      },
+      {
+        "description": "drop temporary default from column \"imageCredit\"",
+        "sql": "ALTER TABLE \"public\".\"Card\" ALTER COLUMN \"imageCredit\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"imageCredit\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageCredit"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"imageCredit\" on \"Card\""
+        }
+      },
+      {
+        "description": "verify column \"imageCredit\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageCredit",
+          "NO"
+        ]
+      },
+      {
+        "description": "verify column \"imageCredit\" has no default after temporary default removal",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NOT NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageCredit"
+        ]
+      },
+      {
+        "description": "verify column \"imageCredit\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageCredit",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.Card.imageUrl",
+    "label": "Add column imageUrl to Card",
+    "summary": "Adds column imageUrl to table Card",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Card"
+      }
+    },
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "ensure column \"imageUrl\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageUrl"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"imageUrl\" on \"Card\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"imageUrl\"",
+        "sql": "ALTER TABLE \"public\".\"Card\" ADD COLUMN \"imageUrl\" text DEFAULT ('') NOT NULL"
+      },
+      {
+        "description": "drop temporary default from column \"imageUrl\"",
+        "sql": "ALTER TABLE \"public\".\"Card\" ALTER COLUMN \"imageUrl\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"imageUrl\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageUrl"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"imageUrl\" on \"Card\""
+        }
+      },
+      {
+        "description": "verify column \"imageUrl\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageUrl",
+          "NO"
+        ]
+      },
+      {
+        "description": "verify column \"imageUrl\" has no default after temporary default removal",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NOT NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageUrl"
+        ]
+      },
+      {
+        "description": "verify column \"imageUrl\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "Card",
+          "imageUrl",
+          "text"
+        ]
+      }
+    ]
+  }
+]

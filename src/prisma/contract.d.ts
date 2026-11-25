@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-postgres/contract-types';
 
 export type StorageHash =
-  StorageHashBase<'444761c06bb0c698252de4a0c47cfacd102ccc7a672d80ecb1ab1742bf5e1341'>;
+  StorageHashBase<'b00c6d4be4b746e5a3d7dac936f33851122d7b5542fcbd58d4d3d608f172513e'>;
 export type ExecutionHash =
   ExecutionHashBase<'a21fb9e45d83e78b31f0348ea922789c98ec68bb1a65e27cddf9bbc4325b3753'>;
 export type ProfileHash =
@@ -339,7 +339,11 @@ export namespace Models {
   export type public_Card = {
     category: FieldOutputTypes['public']['Card']['category'];
     createdAt: FieldOutputTypes['public']['Card']['createdAt'];
+    description: FieldOutputTypes['public']['Card']['description'];
     id: FieldOutputTypes['public']['Card']['id'];
+    imageAlt: FieldOutputTypes['public']['Card']['imageAlt'];
+    imageCredit: FieldOutputTypes['public']['Card']['imageCredit'];
+    imageUrl: FieldOutputTypes['public']['Card']['imageUrl'];
     title: FieldOutputTypes['public']['Card']['title'];
     year: FieldOutputTypes['public']['Card']['year'];
     runCards: public_RunCard[];
@@ -405,7 +409,31 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly precision: 3 };
                   readonly many: false;
                 };
+                readonly description: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
                 readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly imageAlt: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly imageCredit: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly imageUrl: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
@@ -576,7 +604,23 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly precision: 3 };
                 };
               };
+              readonly description: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly imageAlt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly imageCredit: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly imageUrl: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
@@ -608,7 +652,11 @@ type ContractBase = Omit<
               readonly fields: {
                 readonly category: { readonly column: 'category' };
                 readonly createdAt: { readonly column: 'createdAt' };
+                readonly description: { readonly column: 'description' };
                 readonly id: { readonly column: 'id' };
+                readonly imageAlt: { readonly column: 'imageAlt' };
+                readonly imageCredit: { readonly column: 'imageCredit' };
+                readonly imageUrl: { readonly column: 'imageUrl' };
                 readonly title: { readonly column: 'title' };
                 readonly year: { readonly column: 'year' };
               };

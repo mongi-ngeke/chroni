@@ -76,7 +76,35 @@
                   }
                 }
               },
+              "description": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "imageAlt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "imageCredit": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "imageUrl": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -123,8 +151,20 @@
                 "createdAt": {
                   "column": "createdAt"
                 },
+                "description": {
+                  "column": "description"
+                },
                 "id": {
                   "column": "id"
+                },
+                "imageAlt": {
+                  "column": "imageAlt"
+                },
+                "imageCredit": {
+                  "column": "imageCredit"
+                },
+                "imageUrl": {
+                  "column": "imageUrl"
                 },
                 "title": {
                   "column": "title"
@@ -330,7 +370,27 @@
                     "precision": 3
                   }
                 },
+                "description": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
                 "id": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "imageAlt": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "imageCredit": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "imageUrl": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": false
@@ -542,7 +602,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "444761c06bb0c698252de4a0c47cfacd102ccc7a672d80ecb1ab1742bf5e1341"
+    "storageHash": "b00c6d4be4b746e5a3d7dac936f33851122d7b5542fcbd58d4d3d608f172513e"
   },
   "execution": {
     "executionHash": "a21fb9e45d83e78b31f0348ea922789c98ec68bb1a65e27cddf9bbc4325b3753",

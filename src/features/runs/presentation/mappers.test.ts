@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { Card } from "@/features/cards";
+import { buildCard } from "@tests/support/cards";
 import { Run } from "../domain/run";
 import { toPlayResponse, toRunResponse } from "./mappers";
 import { hiddenCardSchema, playRequestSchema, runResponseSchema } from "./schemas";
 
-const card = (id: string, year: number, category?: string) => Card.create({ id, title: `Event ${id}`, year, category });
+const card = (id: string, year: number, category?: string) => buildCard({ id, year, category });
 
 // Années volontairement reconnaissables pour chercher une fuite dans le JSON.
 const HAND_YEAR = 1234;

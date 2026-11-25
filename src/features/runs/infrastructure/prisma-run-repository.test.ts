@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { Card, type CardRepository } from "@/features/cards";
 import { db } from "@/prisma/db";
-import { resetDatabase } from "@tests/support/database";
+import { insertCard, resetDatabase } from "@tests/support/database";
 import { PrismaCardRepository } from "@/features/cards/infrastructure/prisma-card-repository";
 import { Run } from "../domain/run";
 import { PrismaRunRepository } from "./prisma-run-repository";
@@ -12,7 +12,7 @@ const ids = (cards: readonly Card[]) => cards.map((card) => card.id);
 
 async function seedCards(count: number): Promise<Card[]> {
   for (let i = 1; i <= count; i += 1) {
-    await db.orm.public.Card.create({ id: `c${i}`, title: `Event ${i}`, year: 1000 + i });
+    await insertCard({ id: `c${i}`, year: 1000 + i });
   }
   return cardRepository.findAll();
 }

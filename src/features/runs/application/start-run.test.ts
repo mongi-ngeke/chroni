@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Card } from "@/features/cards";
+import { buildCard } from "@tests/support/cards";
 import { NotEnoughCardsError } from "../domain/errors";
 import type { Shuffle } from "../domain/run";
 import { startRun } from "./start-run";
@@ -8,7 +8,7 @@ import { InMemoryCardRepository, InMemoryRunRepository, SequentialIdGenerator } 
 const reverse: Shuffle = (items) => [...items].reverse();
 
 const makeCards = (count: number) =>
-  Array.from({ length: count }, (_, i) => Card.create({ id: `card-${i + 1}`, title: `Event ${i + 1}`, year: 1000 + i }));
+  Array.from({ length: count }, (_, i) => buildCard({ id: `card-${i + 1}`, year: 1000 + i }));
 
 function setup(cardCount: number) {
   const runs = new InMemoryRunRepository();

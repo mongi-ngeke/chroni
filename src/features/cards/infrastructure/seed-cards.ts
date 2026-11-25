@@ -9,7 +9,15 @@ export async function seedCardsInto(db: Db): Promise<number> {
 
   await db.transaction(async (tx) => {
     for (const card of cards) {
-      const data = { title: card.title, year: card.year, category: card.category ?? null };
+      const data = {
+        title: card.title,
+        year: card.year,
+        category: card.category ?? null,
+        description: card.description,
+        imageUrl: card.image.url,
+        imageAlt: card.image.alt,
+        imageCredit: card.image.credit,
+      };
       await tx.orm.public.Card.upsert({ create: { id: card.id, ...data }, update: data });
     }
   });

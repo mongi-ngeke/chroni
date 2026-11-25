@@ -13,6 +13,20 @@ describe("seedCardsInto", () => {
     expect(await db.orm.public.Card.all()).toHaveLength(100);
   });
 
+  it("stores the description and the image of each card", async () => {
+    await seedCardsInto(db);
+
+    const rows = await db.orm.public.Card.all();
+
+    expect(rows).toHaveLength(100);
+    for (const row of rows) {
+      expect(row.description, row.title).not.toBe("");
+      expect(row.imageUrl, row.title).toMatch(/^https:\/\/upload\.wikimedia\.org\//);
+      expect(row.imageAlt, row.title).not.toBe("");
+      expect(row.imageCredit, row.title).toMatch(/Wikimedia Commons$/);
+    }
+  });
+
   it("updates an existing card instead of duplicating it", async () => {
     await seedCardsInto(db);
     await db.orm.public.Card.where({ id: "prise-de-la-bastille" }).update({ year: 1 });

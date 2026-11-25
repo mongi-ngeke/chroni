@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { Card } from "@/features/cards";
+import type { Card } from "@/features/cards";
+import { buildCard } from "@tests/support/cards";
 import { CardNotInHandError, InvalidPositionError, RunAlreadyWonError } from "./errors";
 import { Run } from "./run";
 
-const card = (id: string, year: number) => Card.create({ id, title: `Event ${id}`, year });
+const card = (id: string, year: number) => buildCard({ id, year });
 const ids = (cards: readonly Card[]) => cards.map((c) => c.id);
 
 interface Setup {

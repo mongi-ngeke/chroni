@@ -17,12 +17,17 @@ enum RunZone {
 }
 
 model Card {
-  id        String    @id @onCreate(cuid(2))
-  title     String
-  year      Int
-  category  String?
-  createdAt DateTime  @onCreate(now())
-  runCards  RunCard[]
+  id          String    @id @onCreate(cuid(2))
+  title       String
+  year        Int
+  category    String?
+  // Visibles dès la main : ne doivent jamais contenir la date (voir docs/agent/game-rules.md).
+  description String
+  imageUrl    String
+  imageAlt    String
+  imageCredit String
+  createdAt   DateTime  @onCreate(now())
+  runCards    RunCard[]
 }
 
 model Run {
