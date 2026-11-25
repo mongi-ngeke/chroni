@@ -93,6 +93,14 @@ describe("Hand", () => {
     expect(html).toContain("w-screen");
   });
 
+  it("stretches every card to the height of the tallest one", () => {
+    const html = renderToStaticMarkup(<Hand cards={hand} selectedCardId={null} disabled={false} onSelect={() => {}} />);
+
+    expect(html).toContain("items-stretch");
+    expect(html.match(/<li class="flex">/g)).toHaveLength(2);
+    expect(html.match(/<button[^>]*class="flex /g)).toHaveLength(2);
+  });
+
   it("disables the cards while a play is pending", () => {
     const html = renderToStaticMarkup(<Hand cards={hand} selectedCardId={null} disabled onSelect={() => {}} />);
 
