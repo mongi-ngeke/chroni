@@ -89,7 +89,14 @@ export function GameBoard({ initialRun }: { initialRun: RunResponse }) {
           <ul className="flex flex-wrap gap-3">
             {run.discard.map((card) => (
               <li key={card.id}>
-                <CardView title={card.title} category={card.category} year={card.year} missed />
+                <CardView
+                  title={card.title}
+                  category={card.category}
+                  description={card.description}
+                  image={card.image}
+                  year={card.year}
+                  missed
+                />
               </li>
             ))}
           </ul>

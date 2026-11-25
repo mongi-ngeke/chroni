@@ -30,21 +30,43 @@ const run: RunResponse = {
   discard: [],
 };
 
+const content = {
+  description: "Une description complète de la carte, affichée en entier.",
+  image: {
+    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Example.jpg/960px-Example.jpg",
+    alt: "Une image de test",
+  },
+};
+
+/** Texte visible du HTML : les attributs des images (largeurs d'écran, URL) ne sont pas du contenu. */
+const visibleText = (html: string) => html.replace(/<[^>]*>/g, " ");
+
 describe("CardView", () => {
+  it("shows the image with its alt text and the full description", () => {
+    const html = renderToStaticMarkup(<CardView title="Alpha" {...content} />);
+
+    expect(html).toContain("<img");
+    expect(html).toContain('alt="Une image de test"');
+    // Chargée directement depuis Wikimedia, sans passer par l'optimiseur de Next (voir card-view.tsx).
+    expect(html).toContain(`src="${content.image.url}"`);
+    expect(html).not.toContain("/_next/image");
+    expect(html).toContain("Une description complète de la carte, affichée en entier.");
+  });
+
   it("shows a hidden date placeholder when there is no year", () => {
-    const html = renderToStaticMarkup(<CardView title="Alpha" />);
+    const html = renderToStaticMarkup(<CardView title="Alpha" {...content} />);
 
     expect(html).toContain("????");
     expect(html).toContain("Date cachée");
   });
 
   it("formats a revealed year, including before the common era", () => {
-    expect(renderToStaticMarkup(<CardView title="Marathon" year={-490} />)).toContain("490 av. J.-C.");
-    expect(renderToStaticMarkup(<CardView title="Bastille" year={1789} />)).toContain("1789");
+    expect(renderToStaticMarkup(<CardView title="Marathon" year={-490} {...content} />)).toContain("490 av. J.-C.");
+    expect(renderToStaticMarkup(<CardView title="Bastille" year={1789} {...content} />)).toContain("1789");
   });
 
   it("shows the category label in French", () => {
-    expect(renderToStaticMarkup(<CardView title="x" category="cultural" />)).toContain("Culture");
+    expect(renderToStaticMarkup(<CardView title="x" category="cultural" {...content} />)).toContain("Culture");
   });
 });
 
@@ -109,7 +131,7 @@ describe("GameBoard", () => {
     expect(html).toContain("Votre main (2)");
     expect(html).toContain("4 cartes dans la pioche");
     // Seules les cartes de la frise portent une date.
-    expect(html.match(/\d{4}/g)).toEqual(["1789"]);
+    expect(visibleText(html).match(/\d{4}/g)).toEqual(["1789"]);
     expect(html).toContain("490 av. J.-C.");
   });
 
