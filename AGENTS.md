@@ -9,9 +9,9 @@ Architecture : feature-based DDD. Projet démarré de zéro.
 
 ## Méthode de travail (OBLIGATOIRE)
 
-### 1. Plan d'abord, aucun code avant validation
-Pour toute tâche non triviale, ne PAS écrire de code ni créer de fichier.
-Présenter d'abord un plan contenant :
+### 1. Présenter le plan, puis l'exécuter
+Pour toute tâche non triviale, présenter le plan avant d'écrire du code ou de
+créer des fichiers. Le plan décrit
 - le besoin reformulé en une ou deux phrases ;
 - les fichiers à créer ou à modifier, rangés par couche (domain,
   application, infrastructure, presentation) ;
@@ -19,8 +19,9 @@ Présenter d'abord un plan contenant :
 - les cas limites identifiés et les tests prévus ;
 - le découpage en commits atomiques (liste ordonnée, un message par commit).
 
-Puis ATTENDRE ma validation explicite. Si le plan est ambigu, poser la
-question avant de continuer.
+Après présentation, exécuter le plan en autonomie dans le périmètre du
+projet. Si une ambiguïté empêche de poursuivre, poser la question. Les règles
+d'approbation de la section « Périmètre et sécurité » restent applicables.
 
 ### 2. Commits atomiques, présentés avant d'être faits
 - Un commit = un changement logique unique, qui compile et dont les tests
@@ -31,11 +32,11 @@ question avant de continuer.
   2. la liste des fichiers touchés ;
   3. un résumé du diff et la raison du changement ;
   4. le résultat des vérifications.
-- Attendre mon accord avant de lancer `git commit`, puis passer au suivant.
-- Ne jamais utiliser `git commit --amend`, `git push --force` ni `git push`
-  sans demande explicite.
-- Si je demande un changement après présentation, l'appliquer dans le même
-  commit (pas encore créé) plutôt que d'en ajouter un de correction.
+- Après présentation et réussite des vérifications, lancer `git commit`
+  en autonomie, puis passer au commit suivant.
+- Si je demande un changement après présentation et que le commit est encore
+  à créer, intégrer le changement et relancer les vérifications avant de
+  créer le commit.
 
 ### 3. Tests d'abord quand c'est pertinent
 Pour le domaine : écrire le test qui échoue, puis l'implémentation (un commit
@@ -43,20 +44,15 @@ pour le test, un pour le code, ou un seul si je le préfère : le dire dans le
 plan).
 
 ## Périmètre et sécurité (OBLIGATOIRE)
-- Rester STRICTEMENT dans le dossier du projet : ne lire, écrire, modifier
-  ni lister rien en dehors (pas de `..`, pas de `~`, pas de `/etc`, `/var`,
-  `/tmp`, `/opt`, `/Users`, ni de lien symbolique qui sorte du projet).
-- Dans le projet, les actions courantes (lecture, édition, tests, lint,
-  build) s'exécutent sans demander confirmation.
-- Demander mon accord explicite, en montrant la commande exacte, avant toute
-  action destructrice : `rm -rf`, `git push --force`, `git reset --hard`,
-  réinitialisation de la base (`prisma migrate reset`, `dropdb`),
-  suppression de migrations ou de volumes Docker.
-- Si une commande est bloquée ou refusée, ne pas la contourner (autre
-  syntaxe, autre outil, script intermédiaire) : m'expliquer le besoin.
-- Ne jamais lancer une commande dont l'effet porte hors du projet
-  (installation globale, modification de la configuration du système ou du
-  shell).
+
+- Limiter strictement les créations, modifications et suppressions de fichiers au dossier du projet.
+- Autoriser la lecture et l'exécution des outils externes nécessaires au développement : Node.js, Volta, pnpm, Git, Xcode et les bibliothèques système.
+- Ne pas explorer les autres projets ni les fichiers personnels.
+- Ne jamais modifier les outils installés globalement ni la configuration du système ou du shell.
+- Exécuter les opérations courantes de développement sans demander de confirmation.
+- Respecter les restrictions imposées par la sandbox.
+- Ne jamais contourner une restriction technique.
+- En cas de blocage, identifier précisément la commande et la permission manquante.
 
 ## Règles non négociables
 - La date d'une carte n'est JAMAIS envoyée au client avant que la carte soit
@@ -87,10 +83,8 @@ migration.
 Avant de présenter un commit : `pnpm typecheck && pnpm lint && pnpm test`.
 
 ## À ne pas faire
-- Pas de dépendance ajoutée sans me le demander.
 - Pas de fonctionnalité hors périmètre (multijoueur, comptes, classements).
 - Pas de secrets ni de fichiers `.env` dans git.
-- Pas de code écrit avant validation du plan.
 - Pas de modification d'une migration Prisma déjà appliquée : en créer une
   nouvelle (`migrations/` est versionné, `.env` ne l'est pas).
 
