@@ -3,7 +3,7 @@
 Jeu solo de frise chronologique : replacez des événements historiques et culturels dans le bon
 ordre, sans connaître leur date.
 
-![Une partie de Chroni : la frise de trois cartes datées en haut ; en bas, la main du joueur en éventail, ses cartes à date cachée se chevauchant en arc](docs/images/chroni-partie.jpg)
+![Une partie de Chroni : la frise de trois cartes datées en haut ; en bas, la main du joueur en éventail, ses cartes à date cachée se chevauchant en arc](docs/images/chroni-partie-eventail.jpg)
 
 ## Objectif fonctionnel
 
