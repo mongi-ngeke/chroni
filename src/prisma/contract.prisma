@@ -30,12 +30,40 @@ model Card {
   runCards    RunCard[]
 }
 
+// Joueur inscrit. L'email est normalisé (minuscules) par le domaine avant d'arriver ici.
+model User {
+  id           String    @id
+  email        String    @unique
+  // Empreinte scrypt avec son sel, jamais le mot de passe.
+  passwordHash String
+  createdAt    DateTime  @onCreate(now())
+  sessions     Session[]
+  runs         Run[]
+}
+
+// Session de connexion. `id` est l'empreinte SHA-256 du jeton du cookie : le jeton lui-même
+// n'est jamais stocké.
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @onCreate(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
 model Run {
   id        String    @id
   status    RunStatus
+  // Absent pour une partie d'invité (accessible par son URL) ; présent, la partie est privée.
+  userId    String?
   createdAt DateTime  @onCreate(now())
   updatedAt DateTime  @onCreate(now()) @onUpdate(now())
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   cards     RunCard[]
+
+  @@index([userId])
 }
 
 // Une carte dans un run. `position` ordonne la frise, la pioche (0 = dessus) et
