@@ -121,3 +121,8 @@ export function poolMessage(run: RunResponse): string {
   }
   return run.drawPileCount === 1 ? "1 carte dans la pioche" : `${run.drawPileCount} cartes dans la pioche`;
 }
+
+/** « 0 carte », « 1 carte », « 2 cartes » : le pluriel français commence à 2. */
+export function cardCount(count: number): string {
+  return count > 1 ? `${count} cartes` : `${count} carte`;
+}

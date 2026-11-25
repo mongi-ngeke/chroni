@@ -189,7 +189,7 @@ describe("GameBoard", () => {
     const html = renderToStaticMarkup(<GameBoard initialRun={run} />);
 
     expect(html).toContain("Frise chronologique");
-    expect(html).toContain("Votre main (2)");
+    expect(html).toContain("Votre main");
     expect(html).toContain("4 cartes dans la pioche");
     // Seules les cartes de la frise portent une date.
     expect(visibleText(html).match(/\d{4}/g)).toEqual(["1789"]);
@@ -204,7 +204,22 @@ describe("GameBoard", () => {
     expect(html).toContain("Victoire");
     expect(html).toContain("Rejouer");
     expect(html).not.toContain("Votre main");
-    expect(html).toContain("Cartes ratées (1)");
+    expect(html).toContain("Cartes ratées");
+    // L'écran de victoire reste sur la page, hors du volet.
+    expect(html.indexOf("Victoire")).toBeGreaterThan(html.indexOf("</aside>"));
+  });
+
+  it("gathers the texts in the side panel and leaves the board to the cards", () => {
+    const html = renderToStaticMarkup(<GameBoard initialRun={run} />);
+    const panel = html.slice(html.indexOf("<aside"), html.indexOf("</aside>"));
+    const board = html.slice(html.indexOf("</aside>"));
+
+    for (const text of ["4 cartes dans la pioche", "Frise chronologique", "Votre main", "2 cartes", "Crédits des images"]) {
+      expect(panel).toContain(text);
+    }
+    expect(board).not.toContain("<h2");
+    expect(board).not.toContain("cartes dans la pioche");
+    expect(board).not.toContain("Crédits des images");
   });
 
   it("links to the image credits", () => {

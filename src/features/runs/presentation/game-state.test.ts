@@ -9,6 +9,7 @@ import {
   initialGameState,
   playSelectedCard,
   poolMessage,
+  cardCount,
   type GameAction,
   type GameState,
 } from "./game-state";
@@ -223,5 +224,13 @@ describe("poolMessage", () => {
 
   it("is empty once the run is won", () => {
     expect(poolMessage({ ...baseRun, status: "won", hand: [] })).toBe("");
+  });
+});
+
+describe("cardCount", () => {
+  it("uses the French plural from two cards on", () => {
+    expect(cardCount(0)).toBe("0 carte");
+    expect(cardCount(1)).toBe("1 carte");
+    expect(cardCount(2)).toBe("2 cartes");
   });
 });
