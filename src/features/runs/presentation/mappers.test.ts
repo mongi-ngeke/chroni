@@ -36,6 +36,22 @@ describe("toRunResponse", () => {
     expect(toRunResponse(run).hand.every((c) => !("year" in c))).toBe(true);
   });
 
+  it("sends the description and the image of every visible card, hand included", () => {
+    const response = toRunResponse(run);
+
+    for (const card of [...response.hand, ...response.timeline, ...response.discard]) {
+      expect(card.description).toEqual(expect.any(String));
+      expect(card.image).toEqual({
+        url: expect.stringMatching(/^https:\/\//),
+        alt: expect.any(String),
+      });
+    }
+  });
+
+  it("does not send the image credit, which is served by the credits page", () => {
+    expect(JSON.stringify(toRunResponse(run))).not.toContain("credit");
+  });
+
   it("does not list the draw pile, only its size", () => {
     const response = toRunResponse(run);
 
@@ -62,7 +78,8 @@ describe("toPlayResponse", () => {
 
     expect(body.outcome).toBe("incorrect");
     expect(body.card).toMatchObject({ id: "h2", year: 1500 });
-    expect(body.drawnCard).toEqual({ id: "d1", title: "Event d1" });
+    expect(body.drawnCard).toMatchObject({ id: "d1", title: "Event d1" });
+    expect(body.drawnCard).not.toHaveProperty("year");
     expect(JSON.stringify(body)).not.toContain(String(PILE_YEAR));
     expect(JSON.stringify(body)).not.toContain(String(HAND_YEAR));
   });

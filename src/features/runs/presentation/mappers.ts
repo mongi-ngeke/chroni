@@ -11,9 +11,13 @@ import {
 
 // Les champs sont copiés un par un : ajouter un champ au domaine ne l'expose jamais par accident.
 function toHiddenCard(card: Card): HiddenCard {
-  return card.category === undefined
-    ? { id: card.id, title: card.title }
-    : { id: card.id, title: card.title, category: card.category };
+  const base = {
+    id: card.id,
+    title: card.title,
+    description: card.description,
+    image: { url: card.image.url, alt: card.image.alt },
+  };
+  return card.category === undefined ? base : { ...base, category: card.category };
 }
 
 function toRevealedCard(card: Card): RevealedCard {

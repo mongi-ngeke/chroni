@@ -10,6 +10,10 @@
 - Une réponse ne contient jamais la date d'une carte non révélée : le schéma
   de réponse doit le garantir (type distinct pour une carte masquée et une
   carte révélée).
+- Une carte (masquée ou révélée) porte `description` et `image { url, alt }`,
+  visibles dès la main : le domaine garantit qu'elles ne contiennent pas la
+  date. Le crédit de l'image n'est jamais dans ces réponses : il est servi
+  par la page `/credits`.
 
 ## Exemple de handler fin
 ```ts

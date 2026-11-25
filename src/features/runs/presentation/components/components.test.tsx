@@ -6,18 +6,19 @@ import { GameBoard } from "./game-board";
 import { Hand } from "./hand";
 import { PlayFeedback } from "./play-feedback";
 import { Timeline } from "./timeline";
+import { hidden, revealed } from "@tests/support/dto";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 // Rendu serveur en environnement node : pas de jsdom, on vérifie le HTML produit.
 
 const timeline: RevealedCard[] = [
-  { id: "t1", title: "Marathon", year: -490, category: "historical" },
-  { id: "t2", title: "Bastille", year: 1789 },
+  revealed("t1", "Marathon", -490, "historical"),
+  revealed("t2", "Bastille", 1789),
 ];
 const hand: HiddenCard[] = [
-  { id: "h1", title: "Alpha", category: "cultural" },
-  { id: "h2", title: "Beta" },
+  hidden("h1", "Alpha", "cultural"),
+  hidden("h2", "Beta"),
 ];
 
 const run: RunResponse = {
@@ -91,7 +92,7 @@ describe("Timeline", () => {
 describe("PlayFeedback", () => {
   it("announces the outcome to screen readers", () => {
     const html = renderToStaticMarkup(
-      <PlayFeedback feedback={{ outcome: "incorrect", card: { id: "c", title: "Alpha", year: 1500 } }} onDismiss={() => {}} />,
+      <PlayFeedback feedback={{ outcome: "incorrect", card: revealed("c", "Alpha", 1500) }} onDismiss={() => {}} />,
     );
 
     expect(html).toContain('role="status"');
@@ -114,7 +115,7 @@ describe("GameBoard", () => {
 
   it("shows the victory screen with a replay button when the run is won", () => {
     const html = renderToStaticMarkup(
-      <GameBoard initialRun={{ ...run, status: "won", hand: [], discard: [{ id: "x", title: "Miss", year: 1500 }] }} />,
+      <GameBoard initialRun={{ ...run, status: "won", hand: [], discard: [revealed("x", "Miss", 1500)] }} />,
     );
 
     expect(html).toContain("Victoire");

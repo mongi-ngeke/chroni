@@ -53,6 +53,18 @@ describe("POST /api/runs", () => {
     const years = [...JSON.stringify(run).matchAll(/"year":(-?\d+)/g)].map((m) => Number(m[1]));
     expect(years).toEqual([run.timeline[0]?.year]);
   });
+
+  it("sends the description and image of the cards in hand, without the image credit", async () => {
+    const response = await startRun();
+    const run = (await response.json()) as RunResponse;
+
+    for (const card of run.hand) {
+      expect(card.description.length).toBeGreaterThan(100);
+      expect(card.image.url).toMatch(/^https:\/\/upload\.wikimedia\.org\//);
+      expect(card.image.alt).not.toBe("");
+    }
+    expect(JSON.stringify(run)).not.toContain("credit");
+  });
 });
 
 describe("GET /api/runs/:id", () => {

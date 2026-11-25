@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { server } from "@tests/msw/server";
 import { ApiError, createRunsApi } from "./api-client";
 import type { PlayResponse, RunResponse } from "./schemas";
+import { hidden, revealed } from "@tests/support/dto";
 
 const BASE = "http://api.test";
 const api = createRunsApi(BASE);
@@ -10,13 +11,13 @@ const api = createRunsApi(BASE);
 const run: RunResponse = {
   id: "run-1",
   status: "in_progress",
-  timeline: [{ id: "t1", title: "Start", year: 1000 }],
-  hand: [{ id: "h1", title: "Hidden" }],
+  timeline: [revealed("t1", "Start", 1000)],
+  hand: [hidden("h1", "Hidden")],
   drawPileCount: 89,
   discard: [],
 };
 
-const playResponse: PlayResponse = { outcome: "correct", card: { id: "h1", title: "Hidden", year: 1100 }, run };
+const playResponse: PlayResponse = { outcome: "correct", card: revealed("h1", "Hidden", 1100), run };
 
 async function caught(promise: Promise<unknown>): Promise<ApiError> {
   try {
@@ -36,7 +37,7 @@ describe("startRun", () => {
   });
 
   it("fails with UNEXPECTED_RESPONSE when a hidden card leaks a year", async () => {
-    const leaking = { ...run, hand: [{ id: "h1", title: "Hidden", year: 1789 }] };
+    const leaking = { ...run, hand: [revealed("h1", "Hidden", 1789)] };
     server.use(http.post(`${BASE}/api/runs`, () => HttpResponse.json(leaking, { status: 201 })));
 
     expect((await caught(api.startRun())).code).toBe("UNEXPECTED_RESPONSE");

@@ -13,14 +13,15 @@ import {
   type GameState,
 } from "./game-state";
 import type { PlayResponse, RunResponse } from "./schemas";
+import { hidden, revealed } from "@tests/support/dto";
 
 const baseRun: RunResponse = {
   id: "run-1",
   status: "in_progress",
-  timeline: [{ id: "t1", title: "Start", year: 1000 }],
+  timeline: [revealed("t1", "Start", 1000)],
   hand: [
-    { id: "h1", title: "Alpha" },
-    { id: "h2", title: "Beta" },
+    hidden("h1", "Alpha"),
+    hidden("h2", "Beta"),
   ],
   drawPileCount: 5,
   discard: [],
@@ -28,15 +29,15 @@ const baseRun: RunResponse = {
 
 const correct: PlayResponse = {
   outcome: "correct",
-  card: { id: "h1", title: "Alpha", year: 1100 },
-  run: { ...baseRun, timeline: [...baseRun.timeline, { id: "h1", title: "Alpha", year: 1100 }], hand: [{ id: "h2", title: "Beta" }] },
+  card: revealed("h1", "Alpha", 1100),
+  run: { ...baseRun, timeline: [...baseRun.timeline, revealed("h1", "Alpha", 1100)], hand: [hidden("h2", "Beta")] },
 };
 
 const incorrect: PlayResponse = {
   outcome: "incorrect",
-  card: { id: "h1", title: "Alpha", year: 1500 },
-  drawnCard: { id: "d1", title: "Gamma" },
-  run: { ...baseRun, hand: [{ id: "h2", title: "Beta" }, { id: "d1", title: "Gamma" }], drawPileCount: 4, discard: [{ id: "h1", title: "Alpha", year: 1500 }] },
+  card: revealed("h1", "Alpha", 1500),
+  drawnCard: hidden("d1", "Gamma"),
+  run: { ...baseRun, hand: [hidden("h2", "Beta"), hidden("d1", "Gamma")], drawPileCount: 4, discard: [revealed("h1", "Alpha", 1500)] },
 };
 
 const start = (): GameState => initialGameState(baseRun);

@@ -2,16 +2,28 @@ import { z } from "zod";
 
 // Deux types distincts : une carte masquée n'a pas de champ `year`, et le schéma
 // strict refuse toute réponse qui en contiendrait un (date jamais envoyée avant révélation).
+//
+// La description et l'image sont visibles dès la main : le domaine garantit qu'elles ne contiennent
+// pas l'année. Le crédit de l'image n'est pas envoyé ici, il est servi par la page /credits.
+export const cardImageSchema = z.strictObject({
+  url: z.url(),
+  alt: z.string(),
+});
+
 export const hiddenCardSchema = z.strictObject({
   id: z.string(),
   title: z.string(),
   category: z.string().optional(),
+  description: z.string(),
+  image: cardImageSchema,
 });
 
 export const revealedCardSchema = z.strictObject({
   id: z.string(),
   title: z.string(),
   category: z.string().optional(),
+  description: z.string(),
+  image: cardImageSchema,
   year: z.number().int(),
 });
 
