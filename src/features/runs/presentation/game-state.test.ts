@@ -10,6 +10,7 @@ import {
   playSelectedCard,
   poolMessage,
   cardCount,
+  fanPosition,
   type GameAction,
   type GameState,
 } from "./game-state";
@@ -232,5 +233,39 @@ describe("cardCount", () => {
     expect(cardCount(0)).toBe("0 carte");
     expect(cardCount(1)).toBe("1 carte");
     expect(cardCount(2)).toBe("2 cartes");
+  });
+});
+
+describe("fanPosition", () => {
+  it("leaves a single card straight", () => {
+    expect(fanPosition(0, 1)).toEqual({ angle: 0, drop: 0 });
+  });
+
+  it("is symmetric around the centre of the hand", () => {
+    for (let index = 0; index < 10; index++) {
+      const mirrored = fanPosition(9 - index, 10);
+      expect(fanPosition(index, 10).angle).toBeCloseTo(-mirrored.angle);
+      expect(fanPosition(index, 10).drop).toBeCloseTo(mirrored.drop);
+    }
+  });
+
+  it("tilts left cards to the left and right cards to the right", () => {
+    expect(fanPosition(0, 3).angle).toBeLessThan(0);
+    expect(fanPosition(1, 3)).toEqual({ angle: 0, drop: 0 });
+    expect(fanPosition(2, 3).angle).toBeGreaterThan(0);
+  });
+
+  it("drops the cards more towards the edges, to draw an arc", () => {
+    expect(fanPosition(0, 10).drop).toBeGreaterThan(fanPosition(3, 10).drop);
+    expect(fanPosition(3, 10).drop).toBeGreaterThan(fanPosition(4, 10).drop);
+  });
+
+  it("keeps the whole fan within its maximal spread, however many cards", () => {
+    for (const count of [2, 5, 10, 20]) {
+      const spread = fanPosition(count - 1, count).angle - fanPosition(0, count).angle;
+      expect(spread).toBeLessThanOrEqual(36);
+    }
+    // Peu de cartes : l'écart entre voisines est plafonné, l'éventail reste serré.
+    expect(fanPosition(1, 2).angle - fanPosition(0, 2).angle).toBe(4);
   });
 });

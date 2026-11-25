@@ -126,3 +126,26 @@ export function poolMessage(run: RunResponse): string {
 export function cardCount(count: number): string {
   return count > 1 ? `${count} cartes` : `${count} carte`;
 }
+
+/** Écart maximal entre deux cartes voisines de l'éventail, et ouverture totale maximale (degrés). */
+const FAN_MAX_STEP = 4;
+const FAN_MAX_SPREAD = 36;
+/** Descente des cartes vers les bords de l'éventail, en pixels par rang au carré. */
+const FAN_DROP = 3;
+
+export interface FanPosition {
+  /** Rotation de la carte autour de son bord inférieur, en degrés (négatif à gauche). */
+  angle: number;
+  /** Décalage vers le bas, en pixels : les cartes du bord descendent pour dessiner un arc. */
+  drop: number;
+}
+
+/** Position d'une carte dans l'éventail de la main : symétrique, centrée sur 0. */
+export function fanPosition(index: number, count: number): FanPosition {
+  if (count <= 1) {
+    return { angle: 0, drop: 0 };
+  }
+  const step = Math.min(FAN_MAX_STEP, FAN_MAX_SPREAD / (count - 1));
+  const rank = index - (count - 1) / 2;
+  return { angle: rank * step, drop: rank * rank * FAN_DROP };
+}
