@@ -289,6 +289,14 @@ describe("GameBoard", () => {
     expect(board).not.toContain("Crédits des images");
   });
 
+  it("shows the account given by the page in the side panel, above the credits", () => {
+    const html = renderToStaticMarkup(<GameBoard initialRun={run} account={<p>Compte de test</p>} />);
+    const panel = html.slice(html.indexOf("<aside"), html.indexOf("</aside>"));
+
+    expect(panel).toContain("Compte de test");
+    expect(panel.indexOf("Compte de test")).toBeLessThan(panel.indexOf("Crédits des images"));
+  });
+
   it("links to the image credits", () => {
     const html = renderToStaticMarkup(<GameBoard initialRun={run} />);
 

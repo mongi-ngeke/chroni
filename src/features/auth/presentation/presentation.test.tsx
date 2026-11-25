@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { server } from "@tests/msw/server";
 import { createAuthApi } from "./api-client";
+import { AccountPanel } from "./components/account-panel";
 import { AuthForm } from "./components/auth-form";
 import { authErrorMessage } from "./messages";
 import type { SessionResponse } from "./schemas";
@@ -99,5 +100,23 @@ describe("AuthForm", () => {
     }
     expect(html).toContain("Au moins 8 caractères.");
     expect(html).toContain('href="/login"');
+  });
+});
+
+describe("AccountPanel", () => {
+  it("tells a guest that the run is open and invites them to log in", () => {
+    const html = renderToStaticMarkup(<AccountPanel email={null} />);
+
+    expect(html).toContain("Partie en invité");
+    expect(html).toContain('href="/login"');
+    expect(html).not.toContain("Se déconnecter");
+  });
+
+  it("shows the email of a logged-in player, that their runs are private, and a log-out button", () => {
+    const html = renderToStaticMarkup(<AccountPanel email="ada@example.org" />);
+
+    expect(html).toContain("ada@example.org");
+    expect(html).toContain("Vos parties sont privées.");
+    expect(html).toMatch(/<button[^>]*>Se déconnecter<\/button>/);
   });
 });

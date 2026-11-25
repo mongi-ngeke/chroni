@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useReducer } from "react";
+import { useMemo, useReducer, type ReactNode } from "react";
 import { createRunsApi } from "../api-client";
 import {
   canPlay,
@@ -19,7 +19,13 @@ import { SidePanel } from "./side-panel";
 import { StartButton } from "./start-button";
 import { Timeline } from "./timeline";
 
-export function GameBoard({ initialRun }: { initialRun: RunResponse }) {
+interface GameBoardProps {
+  initialRun: RunResponse;
+  /** Compte du joueur, affiché dans le volet : fourni par la page, qui connaît la session. */
+  account?: ReactNode;
+}
+
+export function GameBoard({ initialRun, account }: GameBoardProps) {
   const api = useMemo(() => createRunsApi(), []);
   const [state, dispatch] = useReducer(gameReducer, initialRun, initialGameState);
 
@@ -54,7 +60,11 @@ export function GameBoard({ initialRun }: { initialRun: RunResponse }) {
         {selected !== undefined && (
           <p className="text-sm text-amber-800">Choisissez où placer « {selected.title} » sur la frise.</p>
         )}
-        <Link href="/credits" className="mt-auto text-sm text-stone-500 underline hover:text-stone-700">
+        {account !== undefined && <div className="mt-auto border-t border-stone-200 pt-4">{account}</div>}
+        <Link
+          href="/credits"
+          className={`${account === undefined ? "mt-auto " : ""}text-sm text-stone-500 underline hover:text-stone-700`}
+        >
           Crédits des images
         </Link>
       </SidePanel>
