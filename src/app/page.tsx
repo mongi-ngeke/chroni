@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { StartButton } from "@/features/runs/presentation/components/start-button";
 
 export default function HomePage() {
@@ -14,6 +15,9 @@ export default function HomePage() {
         <li>• Vous gagnez quand votre main est vide.</li>
       </ul>
       <StartButton />
+      <Link href="/credits" className="text-sm text-stone-500 underline hover:text-stone-700">
+        Crédits des images
+      </Link>
     </main>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useReducer } from "react";
 import { createRunsApi } from "../api-client";
 import {
@@ -102,6 +103,11 @@ export function GameBoard({ initialRun }: { initialRun: RunResponse }) {
           </ul>
         </section>
       )}
+      <footer className="pb-4 text-center text-sm text-stone-500">
+        <Link href="/credits" className="underline hover:text-stone-700">
+          Crédits des images
+        </Link>
+      </footer>
     </main>
   );
 }

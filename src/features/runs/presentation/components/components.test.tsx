@@ -146,6 +146,13 @@ describe("GameBoard", () => {
     expect(html).toContain("Cartes ratées (1)");
   });
 
+  it("links to the image credits", () => {
+    const html = renderToStaticMarkup(<GameBoard initialRun={run} />);
+
+    expect(html).toContain('href="/credits"');
+    expect(html).toContain("Crédits des images");
+  });
+
   it("announces when the draw pile is empty", () => {
     expect(renderToStaticMarkup(<GameBoard initialRun={{ ...run, drawPileCount: 0 }} />)).toContain("Pioche épuisée");
   });
