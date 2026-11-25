@@ -1,12 +1,10 @@
 @import "tailwindcss";
 
-/* Carte du monde en fond, fixe pendant le défilement. Le voile clair garde les textes
-   et les cartes lisibles sur une illustration très chargée. */
+/* Carte du monde ancienne en fond, fixe pendant le défilement. Pas de voile : les textes
+   sont dans le volet latéral, les cartes et les messages ont leur propre fond. */
 body {
-  background-color: var(--color-stone-50);
-  background-image:
-    linear-gradient(rgb(250 250 249 / 0.55), rgb(250 250 249 / 0.55)),
-    url("/images/background.jpg");
+  background-color: var(--color-stone-900);
+  background-image: url("/images/background.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
