@@ -1,12 +1,7 @@
-/** Erreur métier avec un code stable, repris tel quel par l'API. */
-export abstract class RunError extends Error {
-  abstract readonly code: string;
+import { DomainError } from "@/shared/domain-error";
 
-  constructor(message: string) {
-    super(message);
-    this.name = new.target.name;
-  }
-}
+/** Erreur métier de la feature runs, avec un code stable repris tel quel par l'API. */
+export abstract class RunError extends DomainError {}
 
 export class NotEnoughCardsError extends RunError {
   readonly code = "NOT_ENOUGH_CARDS";
