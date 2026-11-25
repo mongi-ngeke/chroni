@@ -47,6 +47,16 @@ tests/                      # alias @tests/*
   les cas d'usage, pour charger l'état initial. Style : Tailwind CSS.
   La logique d'écran vit dans `game-state.ts` (pure, sans React) ; les
   composants restent fins. Textes affichés en français.
+- Images des cartes : URLs Wikimedia Commons chargées par le navigateur avec
+  `next/image` en mode `unoptimized`. L'optimiseur de Next les téléchargerait
+  côté serveur depuis une seule IP et Wikimedia répond 429 sur une main de
+  10 cartes. Le crédit (auteur, licence) n'est jamais dans les DTO du jeu :
+  il est servi par la page `/credits` (cas d'usage `listCardCredits`, trié par
+  titre, jamais par date).
+- Contenu des cartes : `cards/infrastructure/seed-data.ts` est la source du
+  contenu (titre, année, description, image). Après une migration qui touche
+  `Card`, rejouer `pnpm db:seed` : une carte à contenu vide est refusée par le
+  domaine, ce qui est voulu.
 - Racine de composition : `app/container.ts` est le seul endroit qui importe
   les implémentations de plusieurs features (exception à « via `index.ts` »).
 - Aléatoire (mélange du paquet) injecté en paramètre, jamais `Math.random()`

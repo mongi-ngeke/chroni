@@ -20,3 +20,11 @@
   (fichiers `.test.tsx`) et le HTML est inspecté (dont l'absence de date
   pour les cartes masquées). Le rendu réel se vérifie dans un navigateur.
 - Client API : MSW avec une URL de base absolue.
+- Cartes de test : `buildCard({ id, year })` (`@tests/support/cards`) pour une
+  entité valide, `insertCard({ id, year })` (`@tests/support/database`) pour une
+  ligne en base, `hidden(...)` et `revealed(...)` (`@tests/support/dto`) pour
+  les DTO. Ne pas écrire de carte à la main dans un test.
+- Les données du paquet sont testées dans `seed-data.test.ts` : longueur et
+  nombre de phrases des descriptions, aucun nombre à 3 ou 4 chiffres ni mot
+  « siècle », aucune année dans le nom de fichier d'image (URL décodée).
+- Vérification complète lisible : `pnpm exec vitest run --reporter=verbose`.
