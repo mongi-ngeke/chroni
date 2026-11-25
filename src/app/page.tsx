@@ -3,21 +3,24 @@ import { StartButton } from "@/features/runs/presentation/components/start-butto
 
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center gap-8 p-8 text-center">
-      <h1 className="text-5xl font-bold tracking-tight text-amber-700">Chroni</h1>
-      <p className="text-lg text-stone-700">
-        Replacez des événements historiques et culturels dans le bon ordre chronologique.
-      </p>
-      <ul className="space-y-1 text-left text-stone-600">
-        <li>• Une carte est déjà posée sur la frise, vous avez 10 cartes en main.</li>
-        <li>• Choisissez une carte, puis son emplacement : la date n&apos;est révélée qu&apos;une fois la carte jouée.</li>
-        <li>• Une erreur révèle la carte et vous en fait piocher une autre.</li>
-        <li>• Vous gagnez quand votre main est vide.</li>
-      </ul>
-      <StartButton />
-      <Link href="/credits" className="text-sm text-stone-500 underline hover:text-stone-700">
-        Crédits des images
-      </Link>
+    <main className="mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center p-4 text-center sm:p-8">
+      {/* Panneau clair : le texte reste lisible sur l'illustration de fond. */}
+      <div className="flex flex-col items-center gap-8 rounded-2xl bg-white/90 p-8 shadow-xl backdrop-blur-sm">
+        <h1 className="text-5xl font-bold tracking-tight text-amber-700">Chroni</h1>
+        <p className="text-lg text-stone-700">
+          Replacez des événements historiques et culturels dans le bon ordre chronologique.
+        </p>
+        <ul className="space-y-1 text-left text-stone-600">
+          <li>• Une carte est déjà posée sur la frise, vous avez 10 cartes en main.</li>
+          <li>• Choisissez une carte, puis son emplacement : la date n&apos;est révélée qu&apos;une fois la carte jouée.</li>
+          <li>• Une erreur révèle la carte et vous en fait piocher une autre.</li>
+          <li>• Vous gagnez quand votre main est vide.</li>
+        </ul>
+        <StartButton />
+        <Link href="/credits" className="text-sm text-stone-500 underline hover:text-stone-700">
+          Crédits des images
+        </Link>
+      </div>
     </main>
   );
 }

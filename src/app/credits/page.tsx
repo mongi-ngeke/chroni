@@ -12,7 +12,7 @@ export default async function CreditsPage() {
   const credits = await listCardCredits(container);
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-6 p-4 sm:p-8">
-      <header className="flex flex-col gap-2">
+      <header className="flex flex-col gap-2 rounded-lg bg-white/90 p-4 shadow-sm backdrop-blur-sm">
         <Link href="/" className="text-sm text-amber-700 underline">
           ← Retour à l&apos;accueil
         </Link>
