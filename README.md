@@ -20,6 +20,10 @@ description), mais sa date reste cachée. Une première carte, datée, est déj�
 Quand la pioche est épuisée, la partie continue : le joueur joue ses dernières cartes, et une
 erreur écarte alors la carte sans repioche.
 
+On joue **en invité**, sans compte : la partie est accessible à qui a son adresse. On peut aussi
+**créer un compte** (email et mot de passe) : les parties lancées en étant connecté sont privées,
+seul leur propriétaire peut les voir et les jouer.
+
 **Règle non négociable :** la date d'une carte n'est jamais envoyée au navigateur avant que la
 carte soit jouée ou révélée. Les descriptions et les images, visibles dès la main, ne la
 trahissent pas non plus.
@@ -51,6 +55,7 @@ src/
   features/
     cards/               Paquet de cartes et page des crédits
     runs/                Une partie (« run ») : démarrer, jouer une carte, gagner
+    auth/                Comptes (email et mot de passe) et sessions
       domain/            Règles du jeu, pures : ni Next, ni Prisma, ni Zod, ni React
       application/       Cas d'usage (start-run, play-card, get-run) et ports (interfaces)
       infrastructure/    Dépôts Prisma, mélange cryptographique, générateur d'identifiants
@@ -76,17 +81,32 @@ tests/                   Tests d'API, MSW, aides de test
   les textes alternatifs et les noms de fichier des images.
 - **Un aléatoire injecté.** Le mélange du paquet est passé en paramètre (`crypto` en production,
   mélange déterministe dans les tests). Le domaine n'appelle jamais `Math.random()`.
+- **Une authentification sans bibliothèque ni secret.**
+  - Les mots de passe sont hachés avec scrypt (module `crypto` de Node), avec un sel aléatoire
+    et une comparaison à temps constant.
+  - Une session est un jeton aléatoire de 256 bits, placé dans un cookie `HttpOnly` et
+    `SameSite=Lax` (`Secure` en production), valable 30 jours. La base n'en garde que l'empreinte
+    SHA-256 : une fuite de la base ne permet pas de se connecter à la place d'un joueur.
+  - À la connexion, un email inconnu et un mauvais mot de passe donnent la même réponse, au même
+    coût : ni le message ni le temps de réponse ne révèlent qu'un compte existe.
+  - Une partie privée demandée par un autre joueur répond comme une partie inexistante.
+  - Les cas d'usage `runs` reçoivent seulement l'identifiant du joueur (`null` pour un invité) :
+    ils ne dépendent pas de la feature `auth`.
 - **Une API REST en anglais**, centrée sur la ressource `runs` :
 
   | Méthode | Route | Rôle |
   | --- | --- | --- |
-  | `POST` | `/api/runs` | Démarre une partie (`201`) |
+  | `POST` | `/api/runs` | Démarre une partie (`201`), privée si le joueur est connecté |
   | `GET` | `/api/runs/{id}` | État d'une partie |
   | `POST` | `/api/runs/{id}/plays` | Joue une carte : `{ cardId, position }` |
+  | `POST` | `/api/users` | Crée un compte et connecte : `{ email, password }` (`201`) |
+  | `POST` | `/api/sessions` | Connecte : `{ email, password }` (`201`) |
+  | `DELETE` | `/api/sessions/current` | Déconnecte (`204`) |
 
   Les erreurs suivent le format `{ code, message }`, avec un code métier stable et le statut
   HTTP adapté : `RUN_NOT_FOUND` (404), `CARD_NOT_IN_HAND` (422), `INVALID_POSITION` (422),
-  `RUN_ALREADY_WON` (409), `INVALID_REQUEST` (400).
+  `RUN_ALREADY_WON` (409), `INVALID_EMAIL` (422), `WEAK_PASSWORD` (422),
+  `EMAIL_ALREADY_USED` (409), `INVALID_CREDENTIALS` (401), `INVALID_REQUEST` (400).
 - **Des parties persistées.** L'état d'une partie est en base. L'URL `/runs/{id}` permet de la
   reprendre après un rechargement. La page est rendue côté serveur, puis le plateau est
   interactif côté client.
@@ -141,15 +161,15 @@ migration déjà appliquée ne se modifie jamais : on en crée une nouvelle.
 
 ## Stratégie de tests
 
-Avant chaque commit : `pnpm typecheck && pnpm lint && pnpm test`. La suite compte 308 tests
-répartis dans 23 fichiers.
+Avant chaque commit : `pnpm typecheck && pnpm lint && pnpm test`. La suite compte 424 tests
+répartis dans 32 fichiers.
 
 | Niveau | Ce qui est testé | Comment |
 | --- | --- | --- |
-| Domaine | Placement correct ou faux, égalité d'années, années avant J.-C., pioche épuisée, victoire, partie gagnée qui refuse un coup, contenu des cartes | Tests unitaires exhaustifs, sans mock |
-| Cas d'usage | `startRun`, `playCard`, `getRun`, `listCardCredits` | Dépôts en mémoire et mélange déterministe |
-| Infrastructure | Dépôts Prisma, mélange cryptographique, données du paquet | Vraie base PostgreSQL de test, sans mock de Prisma |
-| API | Routes `runs` : statuts, format des erreurs, validation | Handlers appelés directement, sur la base de test |
+| Domaine | Placement correct ou faux, égalité d'années, années avant J.-C., pioche épuisée, victoire, partie gagnée qui refuse un coup, contenu des cartes, accès aux parties privées, email, mot de passe, expiration des sessions | Tests unitaires exhaustifs, sans mock |
+| Cas d'usage | `startRun`, `playCard`, `getRun`, `listCardCredits`, `signUp`, `logIn`, `logOut`, `currentUser` | Dépôts en mémoire, mélange déterministe, hacheur factice et horloge fixe |
+| Infrastructure | Dépôts Prisma, mélange cryptographique, données du paquet, hachage scrypt, jetons de session | Vraie base PostgreSQL de test, sans mock de Prisma |
+| API | Routes `runs`, `users` et `sessions` : statuts, format des erreurs, validation, cookie de session, parties privées | Handlers appelés directement, sur la base de test |
 | Client HTTP | `api-client.ts` | MSW, avec `onUnhandledRequest: "error"` : un appel imprévu fait échouer le test |
 | Interface | Logique d'écran (`game-state.ts`) et composants | Reducer testé seul ; composants rendus en HTML (`renderToStaticMarkup`), sans jsdom |
 
@@ -161,7 +181,11 @@ Principes :
   Les tests d'intégration partagent la base de test (`fileParallelism: false`) et la remettent à
   zéro entre les tests.
 - **Des aides de test plutôt que des données écrites à la main** (`@tests/support`) :
-  `buildCard`, `insertCard`, `hidden`, `revealed`.
+  `buildCard`, `insertCard`, `insertUser`, `hidden`, `revealed`, et `inMemoryAuth()` pour les cas
+  d'usage d'authentification.
+- **Les parties privées sont vérifiées de bout en bout.** Une partie lancée par un joueur
+  connecté répond 404 à un invité, à un autre joueur et à un cookie falsifié, et ne peut pas être
+  jouée par eux.
 - **Le rendu réel se vérifie dans un navigateur.** Les tests ne remplacent pas un coup d'œil à
   l'écran.
 
@@ -172,14 +196,23 @@ Détails : [`docs/agent/testing.md`](docs/agent/testing.md).
 **Partie**
 - Démarrage d'une partie : paquet de 100 cartes mélangé, 1 carte posée sur la frise, 10 en main,
   89 dans la pioche.
-- Sélection d'une carte, puis placement sur un emplacement de la frise.
+- Sélection d'une carte, puis placement sur la frise : au survol, les deux cartes voisines de
+  l'emplacement visé s'écartent, et un clic pose la carte. Au clavier, des emplacements invisibles
+  ouvrent le même écart.
 - Vérification côté serveur ; l'égalité d'années est acceptée.
 - Carte bien placée : elle rejoint la frise avec sa date.
 - Erreur : la carte est révélée, va dans la défausse, et le joueur pioche une nouvelle carte.
 - Pioche épuisée : la partie continue jusqu'à la dernière carte de la main.
 - Victoire quand la main est vide, avec le bilan des cartes ratées et un bouton « Rejouer ».
 - Partie persistée et reprise par son URL ; page « Partie introuvable » pour un identifiant
-  inconnu.
+  inconnu ou une partie privée d'un autre joueur.
+
+**Comptes**
+- Sur l'accueil, deux façons de jouer : « Jouer en invité », ou se connecter / créer un compte.
+- Inscription ouverte à tous (`/signup`) et connexion (`/login`) par email et mot de passe ;
+  l'inscription connecte aussitôt.
+- Parties privées pour un joueur connecté ; parties d'invité inchangées.
+- Compte affiché dans le volet de la partie et sur l'accueil, avec un bouton de déconnexion.
 
 **Contenu**
 - 100 cartes historiques et culturelles, de l'Antiquité à nos jours. Chacune a un titre, une
@@ -189,8 +222,9 @@ Détails : [`docs/agent/testing.md`](docs/agent/testing.md).
 **Interface**
 - La catégorie et le titre s'affichent sur l'image ; la date apparaît dans une pastille une fois
   la carte révélée.
-- Une frise centrée et une main sur une seule ligne, sur toute la largeur de l'écran, toutes deux
-  défilables horizontalement. Les cartes ont toutes la même hauteur.
+- Une frise centrée, sans indicateur entre les cartes, et une main en éventail, toutes deux sur
+  toute la largeur de l'écran. Les cartes de la main ont toutes la même hauteur ; survolée ou
+  sélectionnée, une carte passe devant et se soulève.
 - Un volet latéral (bouton burger) regroupe les textes : état de la pioche, nombre de cartes de la
   frise, de la main et de la défausse, indication de placement, lien vers les crédits.
 - Un message après chaque coup et des erreurs lisibles.
@@ -207,6 +241,13 @@ Détails : [`docs/agent/testing.md`](docs/agent/testing.md).
 - **Score et statistiques** de la partie : taux de réussite, série de bons placements, durée.
 - **Niveaux de difficulté** : par exemple des cartes thématiques ou des époques plus resserrées.
 
+**Comptes**
+- **Sauver ses parties** : rattacher à son compte les parties jouées en invité, et lister ses
+  parties pour les reprendre. Le propriétaire d'une partie est déjà facultatif en base, ce qui
+  le permet sans refonte.
+- Mot de passe oublié et vérification de l'email (nécessitent l'envoi d'emails).
+- Limitation des tentatives de connexion, contre le test automatisé de mots de passe.
+
 **Contenu**
 - Enrichir le paquet et proposer des thèmes (sciences, arts, sport…).
 - Héberger les images, pour ne plus dépendre de la disponibilité de Wikimedia. Créditer aussi
@@ -221,4 +262,4 @@ Détails : [`docs/agent/testing.md`](docs/agent/testing.md).
 - Mettre en place une intégration continue (typecheck, lint, tests) et un déploiement, par
   exemple sur Prisma Postgres.
 
-**Hors périmètre, par choix :** multijoueur, comptes utilisateur et classements.
+**Hors périmètre, par choix :** multijoueur et classements.

@@ -15,6 +15,21 @@
   date. Le crédit de l'image n'est jamais dans ces réponses : il est servi
   par la page `/credits`.
 
+## Comptes et sessions
+- `POST /api/users` `{ email, password }` : crée le compte et connecte
+  (`201 { user: { id, email } }` + cookie). Erreurs : `422 INVALID_EMAIL`,
+  `422 WEAK_PASSWORD` (8 à 128 caractères), `409 EMAIL_ALREADY_USED`.
+- `POST /api/sessions` `{ email, password }` : connecte (`201`, même corps).
+  Erreur unique `401 INVALID_CREDENTIALS`, que l'email soit inconnu ou le
+  mot de passe faux.
+- `DELETE /api/sessions/current` : déconnecte et efface le cookie (`204`,
+  idempotent).
+- Une réponse ne contient jamais l'empreinte d'un mot de passe ; le jeton de
+  session ne circule que dans `Set-Cookie`.
+- Routes `runs` : le joueur vient du cookie. `POST /api/runs` lance une partie
+  privée si le joueur est connecté, d'invité sinon. La partie privée d'un
+  autre joueur répond `404 RUN_NOT_FOUND`, comme une partie inexistante.
+
 ## Exemple de handler fin
 ```ts
 // src/app/api/runs/route.ts

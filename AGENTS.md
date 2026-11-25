@@ -92,7 +92,7 @@ Avant de présenter un commit : `pnpm typecheck && pnpm lint && pnpm test`.
 ## Documentation à lire AVANT d'agir
 - Toucher à `src/features/**` ou créer une feature :
   `docs/agent/architecture.md`
-- Écrire une règle du jeu, un cas d'usage `runs` ou `cards` :
+- Écrire une règle du jeu, un cas d'usage `runs`, `cards` ou `auth` :
   `docs/agent/game-rules.md`
 - Créer ou modifier une route API : `docs/agent/api-conventions.md`
 - Écrire ou modifier un test : `docs/agent/testing.md`

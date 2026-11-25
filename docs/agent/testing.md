@@ -24,6 +24,13 @@
   entité valide, `insertCard({ id, year })` (`@tests/support/database`) pour une
   ligne en base, `hidden(...)` et `revealed(...)` (`@tests/support/dto`) pour
   les DTO. Ne pas écrire de carte à la main dans un test.
+- Auth : les cas d'usage se testent avec `inMemoryAuth()`
+  (`auth/application/testing/in-memory.ts` : hacheur et jetons factices,
+  horloge fixe) ; le vrai hachage scrypt est testé dans l'infrastructure.
+  Dans les tests d'API, un joueur connecté = l'en-tête `cookie` renvoyé par
+  `POST /api/users` ; `insertUser(id)` (`@tests/support/database`) crée un
+  compte quand le mot de passe ne compte pas. Vérifier qu'une partie privée
+  répond 404 à un invité et à un autre joueur.
 - Les données du paquet sont testées dans `seed-data.test.ts` : longueur et
   nombre de phrases des descriptions, aucun nombre à 3 ou 4 chiffres ni mot
   « siècle », aucune année dans le nom de fichier d'image (URL décodée).

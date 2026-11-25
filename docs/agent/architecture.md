@@ -21,7 +21,10 @@ src/
       index.ts              # API publique de la feature
     cards/
       (même structure)
+    auth/                   # comptes (email + mot de passe) et sessions
+      (même structure)
   shared/                   # utilitaires transverses, sans logique métier
+                            # (DomainError, toHttpError, callApi, env)
   prisma/                   # Prisma 8 : contract.prisma, contract.json/.d.ts
     db.ts                   # client unique ; importé par infrastructure/ seulement
 migrations/                 # migrations générées (versionnées)
@@ -53,6 +56,25 @@ tests/                      # alias @tests/*
   10 cartes. Le crédit (auteur, licence) n'est jamais dans les DTO du jeu :
   il est servi par la page `/credits` (cas d'usage `listCardCredits`, trié par
   titre, jamais par date).
+- Erreurs métier : chaque feature dérive sa famille (`RunError`, `AuthError`)
+  de `DomainError` (`shared/domain-error.ts`) et publie la table de ses
+  statuts HTTP (`RUN_ERROR_STATUS`, `AUTH_ERROR_STATUS`) ; `app/api/http.ts`
+  les fusionne.
+- Authentification (`features/auth`) : sans bibliothèque. Mot de passe haché
+  avec scrypt (module `crypto`, sel aléatoire, comparaison à temps constant).
+  Session en base, identifiée par l'empreinte SHA-256 d'un jeton aléatoire de
+  256 bits ; le jeton n'existe que dans le cookie `chroni_session`
+  (`HttpOnly`, `SameSite=Lax`, `Secure` en production, 30 jours). Aucun secret
+  à configurer.
+- Joueur courant : les routes d'API le lisent dans l'en-tête `Cookie`
+  (`app/api/current-player.ts`, testable hors de Next) ; les pages serveur
+  via `cookies()` (`app/current-player.ts`). Les cas d'usage `runs` reçoivent
+  un `playerId` (`null` pour un invité) et ne connaissent pas la feature auth.
+- Composition entre features dans l'interface : `GameBoard` (runs) reçoit le
+  panneau de compte (auth) par sa prop `account`, rempli par la page.
+- Client Prisma en dev : mis en cache sur `globalThis` et lié à l'empreinte du
+  contrat (`src/prisma/db.ts`) ; après une migration, le rechargement à chaud
+  le recrée.
 - Contenu des cartes : `cards/infrastructure/seed-data.ts` est la source du
   contenu (titre, année, description, image). Après une migration qui touche
   `Card`, rejouer `pnpm db:seed` : une carte à contenu vide est refusée par le

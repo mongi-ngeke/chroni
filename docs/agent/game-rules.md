@@ -8,6 +8,17 @@
   (1 + 10 + 89 avec 100 cartes). Il faut au moins 11 cartes pour démarrer.
 - Partie solo uniquement : ne pas anticiper le multijoueur.
 
+## Joueur : invité ou connecté
+- On joue sans compte (invité) ou connecté (email et mot de passe,
+  inscription ouverte à tous).
+- Partie d'invité : sans propriétaire, accessible à quiconque a son URL
+  (connecté ou non).
+- Partie lancée en étant connecté : privée. Seul son propriétaire la lit et
+  la joue ; pour tout autre, elle est introuvable (on ne révèle pas qu'elle
+  existe). Une partie ne change jamais de propriétaire.
+- Prévu plus tard, pas encore réalisé : rattacher ses parties d'invité à son
+  compte, et lister ses parties.
+
 ## Jouer une carte
 - Le joueur envoie `{ cardId, position }` : la carte doit être dans sa main,
   et `position` va de 0 à la longueur de la frise (insertion avant l'élément
