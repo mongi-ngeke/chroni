@@ -150,3 +150,11 @@ export function fanPosition(index: number, count: number): FanPosition {
   const rank = index - (count - 1) / 2;
   return { angle: rank * step, drop: rank * rank * FAN_DROP };
 }
+
+/**
+ * Position d'insertion sur la frise visée par le pointeur : le nombre de cartes dont le milieu est
+ * à sa gauche (0 = avant la première, `cardMidpoints.length` = après la dernière).
+ */
+export function insertionPosition(pointerX: number, cardMidpoints: readonly number[]): number {
+  return cardMidpoints.filter((midpoint) => midpoint < pointerX).length;
+}

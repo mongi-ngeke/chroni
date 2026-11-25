@@ -11,6 +11,7 @@ import {
   poolMessage,
   cardCount,
   fanPosition,
+  insertionPosition,
   type GameAction,
   type GameState,
 } from "./game-state";
@@ -267,5 +268,28 @@ describe("fanPosition", () => {
     }
     // Peu de cartes : l'écart entre voisines est plafonné, l'éventail reste serré.
     expect(fanPosition(1, 2).angle - fanPosition(0, 2).angle).toBe(4);
+  });
+});
+
+describe("insertionPosition", () => {
+  const midpoints = [100, 300, 500];
+
+  it("targets the start of the timeline left of the first card's middle", () => {
+    expect(insertionPosition(20, midpoints)).toBe(0);
+    expect(insertionPosition(99, midpoints)).toBe(0);
+  });
+
+  it("targets the gap between two cards from one middle to the next", () => {
+    expect(insertionPosition(101, midpoints)).toBe(1);
+    expect(insertionPosition(299, midpoints)).toBe(1);
+    expect(insertionPosition(301, midpoints)).toBe(2);
+  });
+
+  it("targets the end of the timeline right of the last card's middle", () => {
+    expect(insertionPosition(900, midpoints)).toBe(3);
+  });
+
+  it("targets the start of an empty timeline", () => {
+    expect(insertionPosition(500, [])).toBe(0);
   });
 });
